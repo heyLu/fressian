@@ -36,6 +36,8 @@ func TestReadObject(t *testing.T) {
 
 	expectReadObject(t, []byte{NULL}, nil)
 
+	expectReadObject(t, []byte{STRING_PACKED_LENGTH_START}, "")
+
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START}, []interface{}{})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 1, 0x01}, []interface{}{1})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 3, 0x07, 0x04, 0x09}, []interface{}{7, 4, 9})
