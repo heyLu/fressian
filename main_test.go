@@ -8,8 +8,16 @@ import (
 )
 
 func TestReadInt(t *testing.T) {
-	r := NewReader(bytes.NewReader([]byte{0x01}))
+	expectReadInt(t, []byte{0x01}, 1)
+}
+
+func expectReadInt(t *testing.T, bs []byte, res int) {
+	r := newReader(bs)
 	i := r.readInt()
 	tu.RequireNil(t, r.Err())
-	tu.ExpectEqual(t, i, 1)
+	tu.ExpectEqual(t, i, res)
+}
+
+func newReader(bs []byte) *Reader {
+	return NewReader(bytes.NewReader(bs))
 }
