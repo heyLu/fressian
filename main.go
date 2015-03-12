@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 )
 
 // from org.fressian.impl.Codes
@@ -229,7 +230,12 @@ func (r *Reader) read(code byte) interface{} {
 		}
 		result = m
 
-		// TODO: SET, UUID, REGEX, URI, BIGINT, BIGDEC, INST, SYM, KEY
+		// TODO: SET, UUID, REGEX, URI, BIGINT, BIGDEC,
+
+	case INST:
+		result = time.Unix(int64(r.readInt()), 0)
+
+		// TODO: SYM, KEY
 		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
 		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
 

@@ -8,9 +8,11 @@
 ;(.writeObject w 89)
 ;(.writeObject w 33554431)
 
+(.writeObject w (java.util.Date.))
+
 ;(.writeObject w [1 2 3 4 5])
 ;(.writeObject w [1 2 3 4 5 "hello"])
 
-(.writeObject w {"hey" 3, "ho" 2, "answer" 42})
+;(.writeObject w {"hey" 3, "ho" 2, "answer" 42})
 
 (.close w)

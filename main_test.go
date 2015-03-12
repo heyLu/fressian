@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	tu "github.com/klingtnet/gol/util/testing"
 )
@@ -75,6 +76,13 @@ func TestReadObject(t *testing.T) {
 		map[interface{}]interface{}{1: 2, 3: 4, 5: 6})
 	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START + 4, STRING_PACKED_LENGTH_START + 3, 0x61, 0x62, 0x63, 0x2a, 0x07, 0x08},
 		map[interface{}]interface{}{"abc": 42, 7: 8})
+
+	obj := readObject(t, []byte{INST, 0x7b, 0x4c, 0x0f, 0x1e, 0xcd, 0x76})
+	date, ok := obj.(time.Time)
+	if !ok {
+		t.Fatalf("expected a time.Time, but got %#v", obj)
+	}
+	tu.ExpectEqual(t, date.Unix(), int64(1426182819190))
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
