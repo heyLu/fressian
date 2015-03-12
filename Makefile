@@ -10,5 +10,5 @@ deps:
 	curl -sO https://tools.ietf.org/rfc/rfc1950.txt
 
 clean:
-	rm -rf fressian zlib* rfc*
+	rm -rf fressian data.fressian zlib* rfc*
 	rm -f misc/adler32
