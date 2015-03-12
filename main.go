@@ -198,6 +198,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r := newRawReader(f)
-	fmt.Println(r)
+	r := NewReader(f)
+	obj := r.readObject()
+	if r.Err() != nil {
+		log.Fatal(r.Err())
+	}
+	fmt.Printf("%#v\n", obj)
 }
