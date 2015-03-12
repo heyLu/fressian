@@ -31,9 +31,15 @@ example.fressian`, for example.
 
 - `(.writeObject w [1 2 3 4 5])`, `.readObject` returns an `ArrayList`
 
+                  LIST_PACKED_LENGTH_START + 5 = 0xe4 + 5
+                  ^
         00000000  e9 01 02 03 04 05                                 |......|
         00000006
 - `(.writeObject w [1 2 3 4 5 "hello"])`, also an `ArrayList`
 
+                  LIST_PACKED_LENGTH_START + 6 = 0xe4 + 6
+                  ^
+                  |                 STRING_PACKED_LENGTH_START + 5 = 0xda + 5
+                  |                 ^
         00000000  ea 01 02 03 04 05 df 68  65 6c 6c 6f              |.......hello|
         0000000c
