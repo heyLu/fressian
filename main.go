@@ -295,9 +295,15 @@ func (r *Reader) read(code byte) interface{} {
 }
 
 func main() {
-	f, err := os.Open("example.fressian")
-	if err != nil {
-		log.Fatal(err)
+	var f *os.File
+	if len(os.Args) == 1 {
+		f = os.Stdin
+	} else {
+		var err error
+		f, err = os.Open(os.Args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	r := NewReader(f)
