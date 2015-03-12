@@ -26,3 +26,14 @@ Clojure 1.6.0
 
 Then you can inspect `example.fressian` using `hexdump -C
 example.fressian`, for example.
+
+## Examples
+
+- `(.writeObject w [1 2 3 4 5])`, `.readObject` returns an `ArrayList`
+
+        00000000  e9 01 02 03 04 05                                 |......|
+        00000006
+- `(.writeObject w [1 2 3 4 5 "hello"])`, also an `ArrayList`
+
+        00000000  ea 01 02 03 04 05 df 68  65 6c 6c 6f              |.......hello|
+        0000000c
