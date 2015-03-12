@@ -1,6 +1,6 @@
-build: adler32
+build: misc/adler32
 
-adler32: adler32.c
+misc/adler32: misc/adler32.c
 	clang -lz $< -o $@
 
 deps:
@@ -11,4 +11,4 @@ deps:
 
 clean:
 	rm -rf fressian zlib* rfc*
-	rm -f adler32
+	rm -f misc/adler32
