@@ -32,6 +32,27 @@ func TestReadObject(t *testing.T) {
 	expectReadObject(t, []byte{0x09}, 9)
 	expectReadObject(t, []byte{0x21}, 33)
 	expectReadObject(t, []byte{0x3A}, 58)
+	// INT_PACKED_2
+	expectReadObject(t, []byte{0x40, 0x00}, -4096)
+	expectReadObject(t, []byte{0x50, 0x00}, 0)
+	expectReadObject(t, []byte{0x5F, 0xFF}, 4095)
+	// INT_PACKED_3
+	expectReadObject(t, []byte{0x60, 0x00, 0x00}, -524288)
+	expectReadObject(t, []byte{0x68, 0x00, 0x00}, 0)
+	expectReadObject(t, []byte{0x6F, 0xFF, 0xFF}, 524287)
+	// INT_PACKED_4
+	expectReadObject(t, []byte{0x70, 0x00, 0x00, 0x00}, -33554432)
+	expectReadObject(t, []byte{0x72, 0x00, 0x00, 0x00}, 0)
+	expectReadObject(t, []byte{0x73, 0xFF, 0xFF, 0xFF}, 33554431)
+	// INT_PACKED_5
+	expectReadObject(t, []byte{0x74, 0x00, 0x00, 0x00, 0x00}, -8589934592)
+	expectReadObject(t, []byte{0x77, 0xFF, 0xFF, 0xFF, 0xFF}, 8589934591)
+	// INT_PACKED_6
+	expectReadObject(t, []byte{0x78, 0x00, 0x00, 0x00, 0x00, 0x00}, -2199023255552)
+	expectReadObject(t, []byte{0x7B, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, 2199023255551)
+	// INT_PACKED_7
+	expectReadObject(t, []byte{0x7C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, -562949953421312)
+	expectReadObject(t, []byte{0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}, 562949953421311)
 
 	expectReadObject(t, []byte{TRUE}, true)
 	expectReadObject(t, []byte{FALSE}, false)
