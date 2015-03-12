@@ -169,8 +169,20 @@ func (r *Reader) read(code byte) interface{} {
 		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
 		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
 
-	case STRING_PACKED_LENGTH_START + 0:
-		result = ""
+	case STRING_PACKED_LENGTH_START + 0,
+		STRING_PACKED_LENGTH_START + 1,
+		STRING_PACKED_LENGTH_START + 2,
+		STRING_PACKED_LENGTH_START + 3,
+		STRING_PACKED_LENGTH_START + 4,
+		STRING_PACKED_LENGTH_START + 5,
+		STRING_PACKED_LENGTH_START + 6,
+		STRING_PACKED_LENGTH_START + 7:
+		length := int(code - STRING_PACKED_LENGTH_START)
+		bs := make([]byte, length)
+		for i := 0; i < length; i++ {
+			bs[i] = r.raw.readRawByte()
+		}
+		result = string(bs)
 
 		// TODO: STRING, STRING_CHUNK
 
