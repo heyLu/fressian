@@ -151,6 +151,47 @@ func (r *Reader) readInt() int {
 	return result
 }
 
+func (r *Reader) readObject() interface{} {
+	return r.read(r.readNextCode())
+}
+
+func (r *Reader) read(code byte) interface{} {
+	var result interface{}
+
+	switch code {
+	case 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09:
+		// TODO: 0x1A - 0x7F
+		result = int(code) & 0xFF
+
+		// TODO: {GET,PUT}_PRIORITY_CACHE, PRIORITY_CACHE_PACKED_START + {0..31}
+		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
+		// TODO: MAP, SET, UUID, REGEX, URI, BIGINT, BIGDEC, INST, SYM, KEY
+		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
+		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
+		// TODO: STRING_PACKED_LENGTH_START + {0..7}, STRING, STRING_CHUNK
+		// TODO: LIST_PACKED_LENGTH_START + {0..7}, LIST, BEGIN_{CLOSED,OPEN}_LIST
+
+	case TRUE:
+		result = true
+	case FALSE:
+		result = false
+
+		// TODO: DOUBLE, DOUBLE_0, DOUBLE_1, FLOAT, INT
+
+	case NULL:
+		result = nil
+
+		// TODO: FOOTER
+		// TODO: STRUCTTYPE, STRUCT
+		// TODO: RESET_CACHES
+
+	default:
+		log.Fatal("not implemented or invalid")
+	}
+
+	return result
+}
+
 func main() {
 	f, err := os.Open("example.fressian")
 	if err != nil {

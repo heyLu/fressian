@@ -26,6 +26,19 @@ func expectReadInt(t *testing.T, bs []byte, res int) {
 	tu.ExpectEqual(t, i, res)
 }
 
+func TestReadObject(t *testing.T) {
+	expectReadObject(t, []byte{0x01}, 1)
+	expectReadObject(t, []byte{0x05}, 5)
+	expectReadObject(t, []byte{0x09}, 9)
+}
+
+func expectReadObject(t *testing.T, bs []byte, res interface{}) {
+	r := newReader(bs)
+	obj := r.readObject()
+	tu.RequireNil(t, r.Err())
+	tu.ExpectEqual(t, obj, res)
+}
+
 func newReader(bs []byte) *Reader {
 	return NewReader(bytes.NewReader(bs))
 }
