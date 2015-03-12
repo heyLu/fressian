@@ -1,0 +1,3 @@
+#!/bin/sh
+
+(gzip -cd $1 || cat $1) | clj -cp fressian/target/classes decode.clj
