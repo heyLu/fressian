@@ -36,7 +36,7 @@ func TestReadObject(t *testing.T) {
 
 	expectReadObject(t, []byte{NULL}, nil)
 
-	readObjectList(t, []byte{LIST_PACKED_LENGTH_START}, 0)
+	readObjectList(t, []byte{LIST_PACKED_LENGTH_START}, []interface{}{})
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
@@ -46,14 +46,17 @@ func expectReadObject(t *testing.T, bs []byte, res interface{}) {
 	tu.ExpectEqual(t, obj, res)
 }
 
-func readObjectList(t *testing.T, bs []byte, length int) []interface{} {
+func readObjectList(t *testing.T, bs []byte, res []interface{}) []interface{} {
 	obj := readObject(t, bs)
 	list, ok := obj.([]interface{})
 	if !ok {
 		t.Fatal("readObject did not return a list!", obj)
 	}
-	if len(list) != length {
-		t.Fatalf("len(list) = %d != %d", len(list), length)
+	if len(list) != len(res) {
+		t.Fatalf("len(list) = %d != %d", len(list), len(res))
+	}
+	for i, expected := range res {
+		tu.ExpectEqual(t, list[i], expected)
 	}
 	return list
 }
