@@ -30,6 +30,11 @@ func TestReadObject(t *testing.T) {
 	expectReadObject(t, []byte{0x01}, 1)
 	expectReadObject(t, []byte{0x05}, 5)
 	expectReadObject(t, []byte{0x09}, 9)
+
+	expectReadObject(t, []byte{TRUE}, true)
+	expectReadObject(t, []byte{FALSE}, false)
+
+	expectReadObject(t, []byte{NULL}, nil)
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
