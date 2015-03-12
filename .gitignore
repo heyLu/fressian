@@ -2,5 +2,6 @@ adler32
 
 # deps/resources
 /fressian
+/data.fressian
 /zlib*
 /rfc*.txt
