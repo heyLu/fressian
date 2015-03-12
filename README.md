@@ -29,6 +29,13 @@ example.fressian`, for example.
 
 ## Examples
 
+- numbers from 0 to 63 (0x00 .. 0x3F) are encoded directly
+- numbers from -4096 to 4095 are encoded using 2 bytes (`INT_2_PACKED`)
+
+    the first byte is used to encode the high 8 bits, the second byte
+    encodes the lower 8 bits
+
+    the number is calculated using `(hi - 0x50 << 8) | lo`.
 - `(.writeObject w [1 2 3 4 5])`, `.readObject` returns an `ArrayList`
 
                   LIST_PACKED_LENGTH_START + 5 = 0xe4 + 5
