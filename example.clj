@@ -7,3 +7,5 @@
 
 ;(.writeObject w [1 2 3 4 5])
 (.writeObject w [1 2 3 4 5 "hello"])
+
+(.close w)
