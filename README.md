@@ -23,3 +23,6 @@ Clojure 1.6.0
 [1 2 3 4 5]
 => (.close r)
 ```
+
+Then you can inspect `example.fressian` using `hexdump -C
+example.fressian`, for example.
