@@ -50,3 +50,15 @@ example.fressian`, for example.
                   |                 ^
         00000000  ea 01 02 03 04 05 df 68  65 6c 6c 6f              |.......hello|
         0000000c
+- `(.writeObject w {"hey" 3, "ho" 2, "answer" 42})`
+
+                     LIST_PACKED_LENGTH_START + 6 = 0xe4 + 6
+                     ^
+                     |  STRING_PACKED_LENGTH_START + 3
+                     |  ^   h  e  y
+                  MAP|  |            3  STRING_PACKED_LENGTH + 2
+                  ^  |  |               ^   h  o  2     a  n  s  w
+        00000000  c0 ea dd 68 65 79 03 dc  68 6f 02 e0 61 6e 73 77  |...hey..ho..answ|
+        00000010  65 72 2a                                          |er*|
+        00000013   |
+                   e  r 42
