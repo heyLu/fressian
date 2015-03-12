@@ -67,6 +67,8 @@ func TestReadObject(t *testing.T) {
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START}, []interface{}{})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 1, 0x01}, []interface{}{1})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 3, 0x07, 0x04, 0x09}, []interface{}{7, 4, 9})
+
+	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START}, map[interface{}]interface{}{})
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
@@ -89,6 +91,26 @@ func readObjectList(t *testing.T, bs []byte, res []interface{}) []interface{} {
 		tu.ExpectEqual(t, list[i], expected)
 	}
 	return list
+}
+
+func readObjectMap(t *testing.T, bs []byte, res map[interface{}]interface{}) map[interface{}]interface{} {
+	obj := readObject(t, bs)
+	m, ok := obj.(map[interface{}]interface{})
+	if !ok {
+		t.Fatal("readObject did not return a map!", obj)
+	}
+	if len(m) != len(res) {
+		t.Fatalf("len(m) = %d != %d", len(m), len(res))
+	}
+	for k, v := range res {
+		mv, ok := m[k]
+		if !ok {
+			t.Errorf("key %#v not present", k)
+			continue
+		}
+		tu.ExpectEqual(t, mv, v)
+	}
+	return m
 }
 
 func readObject(t *testing.T, bs []byte) interface{} {

@@ -198,7 +198,11 @@ func (r *Reader) read(code byte) interface{} {
 
 		// TODO: {GET,PUT}_PRIORITY_CACHE, PRIORITY_CACHE_PACKED_START + {0..31}
 		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
-		// TODO: MAP, SET, UUID, REGEX, URI, BIGINT, BIGDEC, INST, SYM, KEY
+
+	case MAP:
+		result = make(map[interface{}]interface{}, 0)
+
+		// TODO: SET, UUID, REGEX, URI, BIGINT, BIGDEC, INST, SYM, KEY
 		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
 		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
 
