@@ -30,6 +30,8 @@ func TestReadObject(t *testing.T) {
 	expectReadObject(t, []byte{0x01}, 1)
 	expectReadObject(t, []byte{0x05}, 5)
 	expectReadObject(t, []byte{0x09}, 9)
+	expectReadObject(t, []byte{0x21}, 33)
+	expectReadObject(t, []byte{0x3A}, 58)
 
 	expectReadObject(t, []byte{TRUE}, true)
 	expectReadObject(t, []byte{FALSE}, false)
