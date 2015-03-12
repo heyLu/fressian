@@ -200,7 +200,12 @@ func (r *Reader) read(code byte) interface{} {
 		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
 
 	case MAP:
-		result = make(map[interface{}]interface{}, 0)
+		kvs := r.readObject().([]interface{})
+		m := make(map[interface{}]interface{}, len(kvs)/2)
+		for i := 0; i < len(kvs); i += 2 {
+			m[kvs[i]] = kvs[i+1]
+		}
+		result = m
 
 		// TODO: SET, UUID, REGEX, URI, BIGINT, BIGDEC, INST, SYM, KEY
 		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY

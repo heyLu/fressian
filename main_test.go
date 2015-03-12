@@ -69,6 +69,12 @@ func TestReadObject(t *testing.T) {
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 3, 0x07, 0x04, 0x09}, []interface{}{7, 4, 9})
 
 	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START}, map[interface{}]interface{}{})
+	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START + 2, 0x01, 0x02},
+		map[interface{}]interface{}{1: 2})
+	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START + 6, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06},
+		map[interface{}]interface{}{1: 2, 3: 4, 5: 6})
+	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START + 4, STRING_PACKED_LENGTH_START + 3, 0x61, 0x62, 0x63, 0x2a, 0x07, 0x08},
+		map[interface{}]interface{}{"abc": 42, 7: 8})
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
