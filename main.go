@@ -103,6 +103,16 @@ type StructType struct {
 	fields int
 }
 
+type Struct6 struct {
+	tag string
+	f1  interface{}
+	f2  interface{}
+	f3  interface{}
+	f4  interface{}
+	f5  interface{}
+	f6  interface{}
+}
+
 type RawReader struct {
 	br    *bufio.Reader
 	count int
@@ -250,20 +260,20 @@ func (r *Reader) read(code byte) interface{} {
 		result = r.priorityCache[idx]
 
 	case GET_PRIORITY_CACHE:
-		idx := r.readInt()
-		if idx < len(r.priorityCache) {
-			obj := r.priorityCache[idx]
-			if obj == UNDER_CONSTRUCTION {
-				log.Fatal("circular reference in cache!")
-			} else {
-				result = obj
-			}
-		} else {
-			log.Fatal("cache index out of range ", idx)
-		}
+		result = lookupCache(r.priorityCache, r.readInt())
 
 		// TODO: PRIORITY_CACHE_PACKED_START + {0..31}
 		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
+
+	case STRUCT_CACHE_PACKED_START + 0, STRUCT_CACHE_PACKED_START + 1,
+		STRUCT_CACHE_PACKED_START + 2, STRUCT_CACHE_PACKED_START + 3,
+		STRUCT_CACHE_PACKED_START + 4, STRUCT_CACHE_PACKED_START + 5,
+		STRUCT_CACHE_PACKED_START + 6, STRUCT_CACHE_PACKED_START + 7,
+		STRUCT_CACHE_PACKED_START + 8, STRUCT_CACHE_PACKED_START + 9,
+		STRUCT_CACHE_PACKED_START + 10, STRUCT_CACHE_PACKED_START + 11,
+		STRUCT_CACHE_PACKED_START + 12, STRUCT_CACHE_PACKED_START + 13,
+		STRUCT_CACHE_PACKED_START + 14, STRUCT_CACHE_PACKED_START + 15:
+		result = lookupCache(r.structCache, int(code-STRUCT_CACHE_PACKED_START)).(StructType)
 
 	case MAP:
 		kvs := r.readObject().([]interface{})
@@ -416,7 +426,7 @@ func (r *Reader) readOpenList() []interface{} {
 	}
 }
 
-func (r *Reader) handleStruct(key string, valueCount int) interface{} {
+func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 	switch key {
 	case "key":
 		namespace := r.readObject()
@@ -438,9 +448,29 @@ func (r *Reader) handleStruct(key string, valueCount int) interface{} {
 		return string(bs)
 
 	default:
-		log.Fatal("not implemented: ", key)
+		if fieldCount == 6 {
+			vals := r.readObjects(6)
+			return Struct6{key, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]}
+		}
+		log.Fatalf("not implemented: %s (%d fields)", key, fieldCount)
 	}
 
+	return nil
+}
+
+func lookupCache(cache []interface{}, idx int) interface{} {
+	if idx < len(cache) {
+		obj := cache[idx]
+		if obj == UNDER_CONSTRUCTION {
+			log.Fatal("circular reference in cache!")
+		} else {
+			return obj
+		}
+	} else {
+		log.Fatal("cache index out of range ", idx)
+	}
+
+	log.Fatal("unreachable")
 	return nil
 }
 
