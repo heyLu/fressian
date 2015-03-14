@@ -558,6 +558,9 @@ func lookupCache(cache []interface{}, idx int) interface{} {
 
 func prettyPrint(indent string, value interface{}) {
 	switch value := value.(type) {
+	case time.Time:
+		fmt.Printf("%s%s\n", indent, value.Format(time.RFC3339))
+
 	case Key:
 		if value.namespace == "" {
 			fmt.Printf("%s:%s\n", indent, value.name)

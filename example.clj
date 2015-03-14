@@ -11,9 +11,9 @@
 ;(.writeObject w 0.0)
 ;(.writeObject w 3.257329852835)
 
-(.writeObject w (long-array [1 2 3]))
+;(.writeObject w (long-array [1 2 3]))
 
-;(.writeObject w (java.util.Date.))
+(.writeObject w (java.util.Date.))
 
 ;(.writeObject w [1 2 3 4 5])
 ;(.writeObject w [1 2 3 4 5 "hello"])
