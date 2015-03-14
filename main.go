@@ -604,10 +604,10 @@ func lookupCache(cache []interface{}, idx int) interface{} {
 func prettyPrint(indent string, value interface{}) {
 	switch value := value.(type) {
 	case time.Time:
-		fmt.Printf("%s%s\n", indent, value.Format(time.RFC3339))
+		fmt.Printf("%s#inst \"%s\"\n", indent, value.Format(time.RFC3339))
 
 	case *url.URL:
-		fmt.Printf("%s%s\n", indent, value)
+		fmt.Printf("%s#uri \"%s\"\n", indent, value)
 
 	case Key:
 		if value.namespace == "" {
@@ -617,26 +617,33 @@ func prettyPrint(indent string, value interface{}) {
 		}
 
 	case StructAny:
-		fmt.Printf("%s:%s (%T)\n", indent, value.tag, value)
+		fmt.Printf("%s#%s [\n", indent, value.tag)
 		for _, val := range value.values {
 			prettyPrint(indent+"  ", val)
 		}
+		fmt.Printf("%s]\n", indent)
 
 	case map[interface{}]interface{}:
-		fmt.Printf("%s%T\n", indent, value)
+		fmt.Printf("%s{\n", indent)
 		for key, val := range value {
 			prettyPrint(indent+"  ", key)
 			prettyPrint(indent+"    ", val)
 		}
+		fmt.Printf("%s}\n", indent)
 
 	case []interface{}:
-		fmt.Printf("%s%T\n", indent, value)
+		fmt.Printf("%s[\n", indent)
 		for _, val := range value {
 			prettyPrint(indent+"  ", val)
 		}
+		fmt.Printf("%s]\n", indent)
 
 	default:
-		fmt.Printf("%s%#v\n", indent, value)
+		if value == nil {
+			fmt.Printf("%snil\n", indent)
+		} else {
+			fmt.Printf("%s%#v\n", indent, value)
+		}
 	}
 }
 
