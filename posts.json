@@ -1,0 +1,8 @@
+[
+	{
+		"id": "818ff28b50576536a788bca50366091a",
+		"title": "Next steps",
+		"content": "- more tests\r\n    - `*_ARRAY`\r\n    - `FLOAT`, `DOUBLE`, `DOUBLE_0`, `DOUBLE_1`\r\n    - for the caches (probably the most tricky)\r\n    - tests should be split up, e.g. `TestReadInt`, `TestReadInt`, `TestReadList`, `TestRead...`\r\n- make it usable\r\n    - `main` should become just `fressian`, maybe in `encoding/fressian`?\r\n    - the pretty-printing part should become a new tool, maybe `fsn pp`?\r\n        - and it would just use the `fressian` package (would require thinking about the public API)\r\n    - document how to use it\r\n- the future\r\n    - writing!\r\n        - maybe write a `gol` backend for fun?\r\n    - extensible handlers, maybe just mirror what `Datomic/fressian` does\r\n    - maybe benchmark it? (not sure against what, would require having some data to use and a benchmark suite for `Datomic/fressian`)\r\n- the far future\r\n    - i also want an `edn` reader (and writer, just for fun)\r\n    - coincidentally, datomic queries are also `edn` data...\r\n    - maybe rename this `clog`? (negative connotations, though.) maybe `clogs`? (\"Holzpantoffel\", not exactly fancy, but kind of cute and indicates that this has multiple things. (`fressian`, `edn`, ...))\r\n\r\nAt this point, I think that we have the world's second most advanced fressian reader? That's... interesting. :)",
+		"created": "2015-03-14T14:46:34.959662666+01:00"
+	}
+]
