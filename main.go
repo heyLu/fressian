@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -582,17 +583,34 @@ func prettyPrint(indent string, value interface{}) {
 	}
 }
 
+func isGzipped(r *bufio.Reader) bool {
+	magic, err := r.Peek(2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return magic[0] == 0x1F && magic[1] == 0x8B
+}
+
 var pretty = flag.Bool("p", false, "pretty print the value read")
 
 func main() {
 	flag.Parse()
 
-	var f *os.File
+	var f io.Reader
 	if flag.NArg() == 0 {
 		f = os.Stdin
 	} else {
 		var err error
 		f, err = os.Open(flag.Arg(0))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	f = bufio.NewReader(f)
+
+	if isGzipped(f.(*bufio.Reader)) {
+		var err error
+		f, err = gzip.NewReader(f)
 		if err != nil {
 			log.Fatal(err)
 		}
