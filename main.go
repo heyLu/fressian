@@ -171,6 +171,17 @@ func (r *RawReader) readRawInt48() int {
 	return (r.readRawInt16() << 32) | r.readRawInt32()
 }
 
+func (r *RawReader) readRawInt64() int {
+	return ((int(r.readRawByte()) & 0xff) << 56) |
+		((int(r.readRawByte()) & 0xff) << 48) |
+		((int(r.readRawByte()) & 0xff) << 40) |
+		((int(r.readRawByte()) & 0xff) << 32) |
+		((int(r.readRawByte()) & 0xff) << 24) |
+		((int(r.readRawByte()) & 0xff) << 16) |
+		((int(r.readRawByte()) & 0xff) << 8) |
+		(int(r.readRawByte()) & 0xff)
+}
+
 type Reader struct {
 	raw           *RawReader
 	priorityCache []interface{}
@@ -223,8 +234,17 @@ func (r *Reader) readInt() int {
 	case 0x7C, 0x7D, 0x7E, 0x7F:
 		result = ((int(code) - INT_PACKED_7_ZERO) << 48) | r.raw.readRawInt48()
 
+	case INT:
+		result = r.raw.readRawInt64()
+
 	default:
-		log.Fatalf("not implemented: 0x%x\n", code)
+		obj := r.read(code)
+		i, ok := obj.(int)
+		if ok {
+			return i
+		} else {
+			log.Fatalf("not an int: 0x%x, %#v\n", code, obj)
+		}
 	}
 
 	return result
@@ -433,7 +453,8 @@ func (r *Reader) read(code byte) interface{} {
 	case FLOAT:
 		result = -1.0
 
-		// TODO: INT
+	case INT:
+		result = r.raw.readRawInt64()
 
 	case NULL:
 		result = nil
