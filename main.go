@@ -98,6 +98,11 @@ type Key struct {
 func (k Key) Key() string          { return "key" }
 func (k Key) Value() []interface{} { return []interface{}{k.namespace, k.name} }
 
+type StructType struct {
+	tag    string
+	fields int
+}
+
 type RawReader struct {
 	br    *bufio.Reader
 	count int
@@ -149,6 +154,7 @@ func (r *RawReader) readRawInt48() int {
 type Reader struct {
 	raw           *RawReader
 	priorityCache []interface{}
+	structCache   []interface{}
 }
 
 type markerObject struct{}
@@ -156,7 +162,7 @@ type markerObject struct{}
 var UNDER_CONSTRUCTION = markerObject{}
 
 func NewReader(r io.Reader) *Reader {
-	return &Reader{newRawReader(r), make([]interface{}, 0, 32)}
+	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16)}
 }
 
 func (r *Reader) Err() error {
@@ -344,10 +350,18 @@ func (r *Reader) read(code byte) interface{} {
 		result = nil
 
 		// TODO: FOOTER
-		// TODO: STRUCTTYPE, STRUCT
+
+	case STRUCTTYPE:
+		tag := r.readObject().(string)
+		fields := r.readInt()
+		r.structCache = append(r.structCache, StructType{tag, fields})
+		result = r.handleStruct(tag, fields)
+
+		// TODO: STRUCT
 
 	case RESET_CACHES:
 		r.priorityCache = make([]interface{}, 0, 32)
+		r.structCache = make([]interface{}, 0, 16)
 		result = r.readObject()
 
 	default:
