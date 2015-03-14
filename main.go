@@ -271,7 +271,11 @@ func (r *Reader) read(code byte) interface{} {
 		}
 		result = list
 
-		// TODO: LIST, BEGIN_{CLOSED,OPEN}_LIST
+	case LIST:
+		length := r.readCount()
+		result = r.readObjects(length)
+
+		// TODO: BEGIN_{CLOSED,OPEN}_LIST
 
 	case TRUE:
 		result = true
@@ -292,6 +296,18 @@ func (r *Reader) read(code byte) interface{} {
 	}
 
 	return result
+}
+
+func (r *Reader) readCount() int {
+	return r.readInt()
+}
+
+func (r *Reader) readObjects(length int) []interface{} {
+	list := make([]interface{}, length)
+	for i := 0; i < length; i++ {
+		list[i] = r.readObject()
+	}
+	return list
 }
 
 func main() {
