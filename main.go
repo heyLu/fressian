@@ -340,7 +340,10 @@ func (r *Reader) read(code byte) interface{} {
 
 		// TODO: FOOTER
 		// TODO: STRUCTTYPE, STRUCT
-		// TODO: RESET_CACHES
+
+	case RESET_CACHES:
+		r.priorityCache = make([]interface{}, 0, 32)
+		result = r.readObject()
 
 	default:
 		log.Fatalf("not implemented or invalid: 0x%x\n", code)
