@@ -116,6 +116,11 @@ type Struct6 struct {
 	f6  interface{}
 }
 
+type StructAny struct {
+	tag    string
+	values []interface{}
+}
+
 type RawReader struct {
 	br    *bufio.Reader
 	count int
@@ -489,6 +494,9 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		if fieldCount == 6 {
 			vals := r.readObjects(6)
 			return Struct6{key, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]}
+		} else {
+			vals := r.readObjects(fieldCount)
+			return StructAny{key, vals}
 		}
 		log.Fatalf("not implemented: %s (%d fields)", key, fieldCount)
 	}
