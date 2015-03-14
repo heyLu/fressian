@@ -465,7 +465,9 @@ func (r *Reader) read(code byte) interface{} {
 		r.structCache = append(r.structCache, StructType{tag, fields})
 		result = r.handleStruct(tag, fields)
 
-		// TODO: STRUCT
+	case STRUCT:
+		st := lookupCache(r.structCache, r.readInt()).(StructType)
+		result = r.handleStruct(st.tag, st.fields)
 
 	case RESET_CACHES:
 		r.priorityCache = make([]interface{}, 0, 32)
