@@ -401,7 +401,7 @@ func (r *Reader) read(code byte) interface{} {
 	case STRING:
 		result = r.internalReadString(r.readCount())
 
-		// TODO: STRING, STRING_CHUNK
+		// TODO: STRING_CHUNK
 
 	case LIST_PACKED_LENGTH_START + 0,
 		LIST_PACKED_LENGTH_START + 1,
