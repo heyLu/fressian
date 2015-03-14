@@ -139,11 +139,16 @@ func (r *RawReader) readRawInt48() int {
 }
 
 type Reader struct {
-	raw *RawReader
+	raw           *RawReader
+	priorityCache []interface{}
 }
 
+type markerObject struct{}
+
+var UNDER_CONSTRUCTION = markerObject{}
+
 func NewReader(r io.Reader) *Reader {
-	return &Reader{newRawReader(r)}
+	return &Reader{newRawReader(r), make([]interface{}, 0, 32)}
 }
 
 func (r *Reader) Err() error {
@@ -224,7 +229,15 @@ func (r *Reader) read(code byte) interface{} {
 	case 0x7C, 0x7D, 0x7E, 0x7F:
 		result = ((int(code) - INT_PACKED_7_ZERO) << 48) | r.raw.readRawInt48()
 
-		// TODO: {GET,PUT}_PRIORITY_CACHE, PRIORITY_CACHE_PACKED_START + {0..31}
+		// TODO: GET_PRIORITY_CACHE:
+
+	case PUT_PRIORITY_CACHE:
+		idx := len(r.priorityCache)
+		r.priorityCache = append(r.priorityCache, UNDER_CONSTRUCTION)
+		r.priorityCache[idx] = r.readObject()
+		result = r.priorityCache[idx]
+
+		// TODO: PRIORITY_CACHE_PACKED_START + {0..31}
 		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
 
 	case MAP:
