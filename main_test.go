@@ -60,6 +60,8 @@ func TestReadObject(t *testing.T) {
 
 	expectReadObject(t, []byte{NULL}, nil)
 
+	readObjectBytes(t, []byte{BYTES, 0x03, 0x01, 0x0A, 0xf9}, []byte{0x01, 0x0A, 0xf9})
+
 	expectReadObject(t, []byte{STRING_PACKED_LENGTH_START}, "")
 	expectReadObject(t, []byte{STRING_PACKED_LENGTH_START + 1, 0x61}, "a")
 	expectReadObject(t, []byte{STRING_PACKED_LENGTH_START + 3, 0x61, 0x62, 0x63}, "abc")
@@ -95,6 +97,15 @@ func expectReadObject(t *testing.T, bs []byte, res interface{}) {
 	obj := r.readObject()
 	tu.RequireNil(t, r.Err())
 	tu.ExpectEqual(t, obj, res)
+}
+
+func readObjectBytes(t *testing.T, bs []byte, res []byte) []byte {
+	bytes := readObject(t, bs).([]byte)
+	tu.RequireEqual(t, len(bytes), len(res))
+	for i, b := range res {
+		tu.ExpectEqual(t, bytes[i], b)
+	}
+	return bytes
 }
 
 func readObjectList(t *testing.T, bs []byte, res []interface{}) []interface{} {
