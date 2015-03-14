@@ -558,6 +558,13 @@ func lookupCache(cache []interface{}, idx int) interface{} {
 
 func prettyPrint(indent string, value interface{}) {
 	switch value := value.(type) {
+	case Key:
+		if value.namespace == "" {
+			fmt.Printf("%s:%s\n", indent, value.name)
+		} else {
+			fmt.Printf("%s:%s/%s\n", indent, value.namespace, value.name)
+		}
+
 	case StructAny:
 		fmt.Printf("%s%s (%T)\n", indent, value.tag, value)
 		for _, val := range value.values {
