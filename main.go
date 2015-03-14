@@ -583,6 +583,9 @@ func prettyPrint(indent string, value interface{}) {
 	case time.Time:
 		fmt.Printf("%s%s\n", indent, value.Format(time.RFC3339))
 
+	case *url.URL:
+		fmt.Printf("%s%s\n", indent, value)
+
 	case Key:
 		if value.namespace == "" {
 			fmt.Printf("%s:%s\n", indent, value.name)
