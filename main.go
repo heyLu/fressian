@@ -375,11 +375,18 @@ func (r *Reader) read(code byte) interface{} {
 	case OBJECT_ARRAY:
 		result = r.readObjects(r.readCount())
 
-		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
+	case BYTES_PACKED_LENGTH_START + 0, BYTES_PACKED_LENGTH_START + 1,
+		BYTES_PACKED_LENGTH_START + 2, BYTES_PACKED_LENGTH_START + 3,
+		BYTES_PACKED_LENGTH_START + 4, BYTES_PACKED_LENGTH_START + 5,
+		BYTES_PACKED_LENGTH_START + 6, BYTES_PACKED_LENGTH_START + 7:
+		result = r.internalReadBytes(int(code - BYTES_PACKED_LENGTH_START))
 
 	case BYTES:
 		length := r.readCount()
 		result = r.internalReadBytes(length)
+
+	case BYTES_CHUNK:
+		result = r.internalReadChunkedBytes()
 
 	case STRING_PACKED_LENGTH_START + 0,
 		STRING_PACKED_LENGTH_START + 1,
@@ -489,6 +496,20 @@ func (r *Reader) internalReadBytes(length int) []byte {
 	for i := 0; i < length; i++ {
 		bs[i] = r.raw.readRawByte()
 	}
+	return bs
+}
+
+func (r *Reader) internalReadChunkedBytes() []byte {
+	bs := make([]byte, 0)
+	code := byte(BYTES_CHUNK)
+	for code == BYTES_CHUNK {
+		bs = append(bs, r.internalReadBytes(r.readCount())...)
+		code = r.readNextCode()
+	}
+	if code != BYTES {
+		log.Fatal("invalid byte chunk")
+	}
+	bs = append(bs, r.internalReadBytes(r.readCount())...)
 	return bs
 }
 
