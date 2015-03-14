@@ -180,7 +180,7 @@ func (r *Reader) readInt() int {
 		result = ((int(code) - INT_PACKED_7_ZERO) << 48) | r.raw.readRawInt48()
 
 	default:
-		log.Fatal("not implemented")
+		log.Fatalf("not implemented: 0x%x\n", code)
 	}
 
 	return result
@@ -288,7 +288,7 @@ func (r *Reader) read(code byte) interface{} {
 		// TODO: RESET_CACHES
 
 	default:
-		log.Fatal("not implemented or invalid")
+		log.Fatalf("not implemented or invalid: 0x%x\n", code)
 	}
 
 	return result
