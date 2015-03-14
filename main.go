@@ -601,6 +601,22 @@ func lookupCache(cache []interface{}, idx int) interface{} {
 	return nil
 }
 
+func prettySprint(value interface{}) string {
+	switch value := value.(type) {
+	case bool, byte, int, float32, float64, string:
+		return fmt.Sprintf("%#v", value)
+	case Key:
+		if value.namespace == "" {
+			return fmt.Sprintf(":%s", value.name)
+		} else {
+			return fmt.Sprintf(":%s/%s", value.namespace, value.name)
+		}
+	default:
+		log.Fatalf("unexpected value: %#v", value)
+		return ""
+	}
+}
+
 func prettyPrint(indent string, value interface{}) {
 	switch value := value.(type) {
 	case time.Time:
@@ -608,13 +624,6 @@ func prettyPrint(indent string, value interface{}) {
 
 	case *url.URL:
 		fmt.Printf("%s#uri \"%s\"\n", indent, value)
-
-	case Key:
-		if value.namespace == "" {
-			fmt.Printf("%s:%s\n", indent, value.name)
-		} else {
-			fmt.Printf("%s:%s/%s\n", indent, value.namespace, value.name)
-		}
 
 	case StructAny:
 		fmt.Printf("%s#%s [\n", indent, value.tag)
@@ -626,8 +635,13 @@ func prettyPrint(indent string, value interface{}) {
 	case map[interface{}]interface{}:
 		fmt.Printf("%s{\n", indent)
 		for key, val := range value {
-			prettyPrint(indent+"  ", key)
-			prettyPrint(indent+"    ", val)
+			switch val.(type) {
+			case bool, byte, int, float32, float64, string, Key:
+				fmt.Printf("%s%s %s\n", indent+"  ", prettySprint(key), prettySprint(val))
+			default:
+				prettyPrint(indent+"  ", key)
+				prettyPrint(indent+"    ", val)
+			}
 		}
 		fmt.Printf("%s}\n", indent)
 
@@ -637,6 +651,9 @@ func prettyPrint(indent string, value interface{}) {
 			prettyPrint(indent+"  ", val)
 		}
 		fmt.Printf("%s]\n", indent)
+
+	case Key:
+		fmt.Printf("%s%s\n", indent, prettySprint(value))
 
 	default:
 		if value == nil {
