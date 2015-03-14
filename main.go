@@ -267,7 +267,12 @@ func (r *Reader) read(code byte) interface{} {
 		}
 		result = m
 
-		// TODO: SET, UUID, REGEX, URI, BIGINT, BIGDEC,
+		// TODO: SET
+
+	case UUID:
+		result = r.handleStruct("uuid", 2)
+
+		// TODO: REGEX, URI, BIGINT, BIGDEC,
 
 	case INST:
 		result = time.Unix(int64(r.readInt()), 0)
@@ -409,6 +414,15 @@ func (r *Reader) handleStruct(key string, valueCount int) interface{} {
 			namespace: namespace.(string),
 			name:      name.(string),
 		}
+
+	case "uuid":
+		obj := r.readObject()
+		bs, ok := obj.([]byte)
+		if !ok || len(bs) != 16 {
+			log.Fatal("invalid uuid")
+		}
+		return string(bs)
+
 	default:
 		log.Fatal("not implemented: ", key)
 	}
