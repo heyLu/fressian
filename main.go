@@ -311,7 +311,41 @@ func (r *Reader) read(code byte) interface{} {
 	case KEY:
 		result = r.handleStruct("key", 2)
 
-		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
+	case INT_ARRAY, LONG_ARRAY:
+		length := r.readCount()
+		nums := make([]int, length)
+		for i := 0; i < length; i++ {
+			nums[i] = r.readInt()
+		}
+		result = nums
+
+	case FLOAT_ARRAY:
+		length := r.readCount()
+		floats := make([]float32, length)
+		for i := 0; i < length; i++ {
+			floats[i] = r.readObject().(float32)
+		}
+		result = floats
+
+	case BOOLEAN_ARRAY:
+		length := r.readCount()
+		bools := make([]bool, length)
+		for i := 0; i < length; i++ {
+			bools[i] = r.readObject().(bool)
+		}
+		result = bools
+
+	case DOUBLE_ARRAY:
+		length := r.readCount()
+		doubles := make([]float64, length)
+		for i := 0; i < length; i++ {
+			doubles[i] = r.readObject().(float64)
+		}
+		result = doubles
+
+	case OBJECT_ARRAY:
+		result = r.readObjects(r.readCount())
+
 		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
 
 	case BYTES:
