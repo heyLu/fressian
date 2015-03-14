@@ -108,16 +108,6 @@ type StructType struct {
 	fields int
 }
 
-type Struct6 struct {
-	tag string
-	f1  interface{}
-	f2  interface{}
-	f3  interface{}
-	f4  interface{}
-	f5  interface{}
-	f6  interface{}
-}
-
 type StructAny struct {
 	tag    string
 	values []interface{}
@@ -564,14 +554,8 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		return u
 
 	default:
-		if fieldCount == 6 {
-			vals := r.readObjects(6)
-			return Struct6{key, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]}
-		} else {
-			vals := r.readObjects(fieldCount)
-			return StructAny{key, vals}
-		}
-		log.Fatalf("not implemented: %s (%d fields)", key, fieldCount)
+		vals := r.readObjects(fieldCount)
+		return StructAny{key, vals}
 	}
 
 	return nil
@@ -609,7 +593,6 @@ func prettyPrint(indent string, value interface{}) {
 		fmt.Printf("%s:%s (%T)\n", indent, value.tag, value)
 		for _, val := range value.values {
 			prettyPrint(indent+"  ", val)
-			fmt.Println()
 		}
 
 	case map[interface{}]interface{}:
