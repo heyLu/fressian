@@ -475,7 +475,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		if !ok || len(bs) != 16 {
 			log.Fatal("invalid uuid")
 		}
-		return string(bs)
+		return fmt.Sprintf("%x-%x-%x-%x-%x", bs[0:4], bs[4:6], bs[6:8], bs[8:10], bs[10:16])
 
 	case "uri":
 		rawUrl := r.readObject().(string)
