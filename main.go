@@ -306,7 +306,8 @@ func (r *Reader) read(code byte) interface{} {
 		// TODO: BIGINT, BIGDEC
 
 	case INST:
-		result = time.Unix(int64(r.readInt()), 0)
+		milliseconds := int64(r.readInt())
+		result = time.Unix(milliseconds/1000, (milliseconds%1000)*10e6)
 
 		// TODO: SYM
 
