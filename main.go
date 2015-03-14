@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -554,13 +555,44 @@ func lookupCache(cache []interface{}, idx int) interface{} {
 	return nil
 }
 
+func prettyPrint(indent string, value interface{}) {
+	switch value := value.(type) {
+	case StructAny:
+		fmt.Printf("%s%s (%T)\n", indent, value.tag, value)
+		for _, val := range value.values {
+			prettyPrint(indent+"  ", val)
+			fmt.Println()
+		}
+
+	case map[interface{}]interface{}:
+		fmt.Printf("%s%T\n", indent, value)
+		for key, val := range value {
+			prettyPrint(indent+"  ", key)
+			prettyPrint(indent+"    ", val)
+		}
+
+	case []interface{}:
+		fmt.Printf("%s%T\n", indent, value)
+		for _, val := range value {
+			prettyPrint(indent+"  ", val)
+		}
+
+	default:
+		fmt.Printf("%s%#v\n", indent, value)
+	}
+}
+
+var pretty = flag.Bool("p", false, "pretty print the value read")
+
 func main() {
+	flag.Parse()
+
 	var f *os.File
-	if len(os.Args) == 1 {
+	if flag.NArg() == 0 {
 		f = os.Stdin
 	} else {
 		var err error
-		f, err = os.Open(os.Args[1])
+		f, err = os.Open(flag.Arg(0))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -571,5 +603,10 @@ func main() {
 	if r.Err() != nil {
 		log.Fatal(r.Err())
 	}
-	fmt.Printf("%#v\n", obj)
+
+	if *pretty {
+		prettyPrint("", obj)
+	} else {
+		fmt.Printf("%#v\n", obj)
+	}
 }
