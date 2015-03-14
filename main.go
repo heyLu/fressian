@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"log"
@@ -309,11 +311,7 @@ func (r *Reader) read(code byte) interface{} {
 
 	case BYTES:
 		length := r.readCount()
-		bs := make([]byte, length)
-		for i := 0; i < length; i++ {
-			bs[i] = r.raw.readRawByte()
-		}
-		result = bs
+		result = r.internalReadBytes(length)
 
 	case STRING_PACKED_LENGTH_START + 0,
 		STRING_PACKED_LENGTH_START + 1,
@@ -360,7 +358,25 @@ func (r *Reader) read(code byte) interface{} {
 	case FALSE:
 		result = false
 
-		// TODO: DOUBLE, DOUBLE_0, DOUBLE_1, FLOAT, INT
+	case DOUBLE:
+		bs := r.internalReadBytes(8)
+		var double float64
+		err := binary.Read(bytes.NewBuffer(bs), binary.BigEndian, &double)
+		if err != nil {
+			log.Fatal("invalid double")
+		}
+		result = double
+
+	case DOUBLE_0:
+		result = float64(0.0)
+
+	case DOUBLE_1:
+		result = float64(1.0)
+
+	case FLOAT:
+		result = -1.0
+
+		// TODO: INT
 
 	case NULL:
 		result = nil
@@ -397,6 +413,14 @@ func (r *Reader) readObjects(length int) []interface{} {
 		list[i] = r.readObject()
 	}
 	return list
+}
+
+func (r *Reader) internalReadBytes(length int) []byte {
+	bs := make([]byte, length)
+	for i := 0; i < length; i++ {
+		bs[i] = r.raw.readRawByte()
+	}
+	return bs
 }
 
 func (r *Reader) internalReadString(length int) string {
