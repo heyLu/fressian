@@ -85,6 +85,11 @@ const (
 	INT_PACKED_7_END            = 0x80
 )
 
+type Tagged struct {
+	Key   string
+	Value []interface{}
+}
+
 type RawReader struct {
 	br    *bufio.Reader
 	count int
@@ -235,7 +240,11 @@ func (r *Reader) read(code byte) interface{} {
 	case INST:
 		result = time.Unix(int64(r.readInt()), 0)
 
-		// TODO: SYM, KEY
+		// TODO: SYM
+
+	case KEY:
+		result = r.handleStruct("key", 2)
+
 		// TODO: {INT,LONG,FLOAT,BOOLEAN,DOUBLE,OBJECT}_ARRAY
 		// TODO: BYTES_PACKED_LENGTH_START + {0..7}, BYTES, BYTES_CHUNK
 
@@ -308,6 +317,13 @@ func (r *Reader) readObjects(length int) []interface{} {
 		list[i] = r.readObject()
 	}
 	return list
+}
+
+func (r *Reader) handleStruct(key string, valueCount int) interface{} {
+	return Tagged{
+		Key:   key,
+		Value: r.readObjects(valueCount),
+	}
 }
 
 func main() {
