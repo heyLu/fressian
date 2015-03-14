@@ -652,6 +652,61 @@ func prettyPrint(indent string, value interface{}) {
 		}
 		fmt.Printf("%s]\n", indent)
 
+	case []bool:
+		fmt.Printf("%s#booleans [", indent)
+		length := len(value)
+		for i, val := range value {
+			if i != length-1 {
+				fmt.Printf("%t, ", val)
+			} else {
+				fmt.Printf("%t]\n", val)
+			}
+		}
+
+	case []byte:
+		fmt.Printf("%s#bytes [", indent)
+		length := len(value)
+		for i, val := range value {
+			if i != length-1 {
+				fmt.Printf("0x%x, ", val)
+			} else {
+				fmt.Printf("0x%x]\n", val)
+			}
+		}
+
+	case []int:
+		fmt.Printf("%s#ints [", indent)
+		length := len(value)
+		for i, val := range value {
+			if i != length-1 {
+				fmt.Printf("%d, ", val)
+			} else {
+				fmt.Printf("%d]\n", val)
+			}
+		}
+
+	case []float32:
+		fmt.Printf("%s#floats [", indent)
+		length := len(value)
+		for i, val := range value {
+			if i != length-1 {
+				fmt.Printf("%f, ", val)
+			} else {
+				fmt.Printf("%f]\n", val)
+			}
+		}
+
+	case []float64:
+		fmt.Printf("%s#doubles [", indent)
+		length := len(value)
+		for i, val := range value {
+			if i != length-1 {
+				fmt.Printf("%f, ", val)
+			} else {
+				fmt.Printf("%f]\n", val)
+			}
+		}
+
 	case Key:
 		fmt.Printf("%s%s\n", indent, prettySprint(value))
 
