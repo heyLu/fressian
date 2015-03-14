@@ -89,7 +89,7 @@ func TestReadObject(t *testing.T) {
 	}
 	tu.ExpectEqual(t, date.Unix(), int64(1426182819190))
 
-	readObjectTagged(t, []byte{KEY, STRING_PACKED_LENGTH_START + 2, 0x61, 0x62, STRING_PACKED_LENGTH_START + 1, 0x63}, Tagged{Key: "key", Value: []interface{}{"ab", "c"}})
+	readObjectTagged(t, []byte{KEY, STRING_PACKED_LENGTH_START + 2, 0x61, 0x62, STRING_PACKED_LENGTH_START + 1, 0x63}, Key{namespace: "ab", name: "c"})
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
@@ -145,10 +145,10 @@ func readObjectMap(t *testing.T, bs []byte, res map[interface{}]interface{}) map
 
 func readObjectTagged(t *testing.T, bs []byte, res Tagged) Tagged {
 	tagged := readObject(t, bs).(Tagged)
-	tu.ExpectEqual(t, tagged.Key, res.Key)
-	tu.RequireEqual(t, len(tagged.Value), len(res.Value))
-	for i, val := range res.Value {
-		tu.ExpectEqual(t, tagged.Value[i], val)
+	tu.ExpectEqual(t, tagged.Key(), res.Key())
+	tu.RequireEqual(t, len(tagged.Value()), len(res.Value()))
+	for i, val := range res.Value() {
+		tu.ExpectEqual(t, tagged.Value()[i], val)
 	}
 	return tagged
 }

@@ -85,10 +85,18 @@ const (
 	INT_PACKED_7_END            = 0x80
 )
 
-type Tagged struct {
-	Key   string
-	Value []interface{}
+type Tagged interface {
+	Key() string
+	Value() []interface{}
 }
+
+type Key struct {
+	namespace string
+	name      string
+}
+
+func (k Key) Key() string          { return "key" }
+func (k Key) Value() []interface{} { return []interface{}{k.namespace, k.name} }
 
 type RawReader struct {
 	br    *bufio.Reader
@@ -358,10 +366,22 @@ func (r *Reader) internalReadString(length int) string {
 }
 
 func (r *Reader) handleStruct(key string, valueCount int) interface{} {
-	return Tagged{
-		Key:   key,
-		Value: r.readObjects(valueCount),
+	switch key {
+	case "key":
+		namespace := r.readObject()
+		if namespace == nil {
+			namespace = ""
+		}
+		name := r.readObject()
+		return Key{
+			namespace: namespace.(string),
+			name:      name.(string),
+		}
+	default:
+		log.Fatal("not implemented: ", key)
 	}
+
+	return nil
 }
 
 func main() {
