@@ -229,13 +229,24 @@ func (r *Reader) read(code byte) interface{} {
 	case 0x7C, 0x7D, 0x7E, 0x7F:
 		result = ((int(code) - INT_PACKED_7_ZERO) << 48) | r.raw.readRawInt48()
 
-		// TODO: GET_PRIORITY_CACHE:
-
 	case PUT_PRIORITY_CACHE:
 		idx := len(r.priorityCache)
 		r.priorityCache = append(r.priorityCache, UNDER_CONSTRUCTION)
 		r.priorityCache[idx] = r.readObject()
 		result = r.priorityCache[idx]
+
+	case GET_PRIORITY_CACHE:
+		idx := r.readInt()
+		if idx < len(r.priorityCache) {
+			obj := r.priorityCache[idx]
+			if obj == UNDER_CONSTRUCTION {
+				log.Fatal("circular reference in cache!")
+			} else {
+				result = obj
+			}
+		} else {
+			log.Fatal("cache index out of range ", idx)
+		}
 
 		// TODO: PRIORITY_CACHE_PACKED_START + {0..31}
 		// TODO: STRUCT_CACHE_PACKED_START + {0..15}
