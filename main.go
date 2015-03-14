@@ -322,7 +322,11 @@ func (r *Reader) read(code byte) interface{} {
 		length := r.readCount()
 		result = r.readObjects(length)
 
-		// TODO: BEGIN_{CLOSED,OPEN}_LIST
+	case BEGIN_CLOSED_LIST:
+		result = r.readClosedList()
+
+	case BEGIN_OPEN_LIST:
+		result = r.readOpenList()
 
 	case TRUE:
 		result = true
@@ -363,6 +367,31 @@ func (r *Reader) internalReadString(length int) string {
 		bs[i] = r.raw.readRawByte()
 	}
 	return string(bs)
+}
+
+func (r *Reader) readClosedList() []interface{} {
+	list := make([]interface{}, 0)
+	for {
+		code := r.readNextCode()
+		if code == END_COLLECTION {
+			return list
+		}
+		list = append(list, r.read(code))
+	}
+}
+
+func (r *Reader) readOpenList() []interface{} {
+	list := make([]interface{}, 0)
+	for {
+		code := r.readNextCode()
+		if r.Err() == io.EOF {
+			code = END_COLLECTION
+		}
+		if code == END_COLLECTION {
+			return list
+		}
+		list = append(list, r.read(code))
+	}
 }
 
 func (r *Reader) handleStruct(key string, valueCount int) interface{} {

@@ -71,8 +71,19 @@ func TestReadObject(t *testing.T) {
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START}, []interface{}{})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 1, 0x01}, []interface{}{1})
 	readObjectList(t, []byte{LIST_PACKED_LENGTH_START + 3, 0x07, 0x04, 0x09}, []interface{}{7, 4, 9})
+
 	readObjectList(t, []byte{LIST, 0x00}, []interface{}{})
 	readObjectList(t, []byte{LIST, 0x0A, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09}, []interface{}{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+
+	readObjectList(t, []byte{BEGIN_CLOSED_LIST, 0x01, 0x02, 0x03, END_COLLECTION}, []interface{}{1, 2, 3})
+	readObjectList(t, []byte{BEGIN_OPEN_LIST, 0x01, 0x02, 0x03, END_COLLECTION}, []interface{}{1, 2, 3})
+	r := newReader([]byte{BEGIN_OPEN_LIST, 0x01, 0x02, 0x03})
+	expected := []interface{}{1, 2, 3}
+	list := r.readObject().([]interface{})
+	tu.RequireEqual(t, len(list), len(expected))
+	for i, val := range expected {
+		tu.ExpectEqual(t, list[i], val)
+	}
 
 	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START}, map[interface{}]interface{}{})
 	readObjectMap(t, []byte{MAP, LIST_PACKED_LENGTH_START + 2, 0x01, 0x02},
