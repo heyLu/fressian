@@ -1,5 +1,6 @@
 /misc/adler32
-/example.fressian
+/*.fressian
+/main
 
 # deps/resources
 /fressian
