@@ -570,7 +570,7 @@ func prettyPrint(indent string, value interface{}) {
 		}
 
 	case StructAny:
-		fmt.Printf("%s%s (%T)\n", indent, value.tag, value)
+		fmt.Printf("%s:%s (%T)\n", indent, value.tag, value)
 		for _, val := range value.values {
 			prettyPrint(indent+"  ", val)
 			fmt.Println()
