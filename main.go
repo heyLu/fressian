@@ -280,12 +280,10 @@ func (r *Reader) read(code byte) interface{} {
 		STRING_PACKED_LENGTH_START + 5,
 		STRING_PACKED_LENGTH_START + 6,
 		STRING_PACKED_LENGTH_START + 7:
-		length := int(code - STRING_PACKED_LENGTH_START)
-		bs := make([]byte, length)
-		for i := 0; i < length; i++ {
-			bs[i] = r.raw.readRawByte()
-		}
-		result = string(bs)
+		result = r.internalReadString(int(code - STRING_PACKED_LENGTH_START))
+
+	case STRING:
+		result = r.internalReadString(r.readCount())
 
 		// TODO: STRING, STRING_CHUNK
 
@@ -341,6 +339,14 @@ func (r *Reader) readObjects(length int) []interface{} {
 		list[i] = r.readObject()
 	}
 	return list
+}
+
+func (r *Reader) internalReadString(length int) string {
+	bs := make([]byte, length)
+	for i := 0; i < length; i++ {
+		bs[i] = r.raw.readRawByte()
+	}
+	return string(bs)
 }
 
 func (r *Reader) handleStruct(key string, valueCount int) interface{} {
