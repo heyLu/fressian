@@ -7,8 +7,11 @@
 
 ;(.writeObject w 89)
 ;(.writeObject w 33554431)
+(.writeObject w (float 1.2345))
+;(.writeObject w 0.0)
+;(.writeObject w 3.257329852835)
 
-(.writeObject w (java.util.Date.))
+;(.writeObject w (java.util.Date.))
 
 ;(.writeObject w [1 2 3 4 5])
 ;(.writeObject w [1 2 3 4 5 "hello"])

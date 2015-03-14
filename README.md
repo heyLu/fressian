@@ -36,6 +36,21 @@ example.fressian`, for example.
     encodes the lower 8 bits
 
     the number is calculated using `(hi - 0x50 << 8) | lo`.
+
+- floating point numbers (32 bit = 4 bytes), `(.writeString w (float 1.2345))`
+
+                  FLOAT
+                  ^
+        00000000  f9 3f 9e 04 19                                    |.?...|
+        00000005
+- double-precision (64 bit = 8 bytes) floating point numbers, `(.writeString w 3.257329852835)`
+
+                  DOUBLE
+                  ^
+        00000000  fa 40 0a 0f 02 f4 31 af  c1                       |.@....1..|
+        00000009
+
+    `0.0` and `1.0` have special encodings, `0xFB` and `0xFC`
 - `(.writeObject w [1 2 3 4 5])`, `.readObject` returns an `ArrayList`
 
                   LIST_PACKED_LENGTH_START + 5 = 0xe4 + 5
