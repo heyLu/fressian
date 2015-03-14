@@ -308,7 +308,8 @@ func (r *Reader) read(code byte) interface{} {
 		STRUCT_CACHE_PACKED_START + 10, STRUCT_CACHE_PACKED_START + 11,
 		STRUCT_CACHE_PACKED_START + 12, STRUCT_CACHE_PACKED_START + 13,
 		STRUCT_CACHE_PACKED_START + 14, STRUCT_CACHE_PACKED_START + 15:
-		result = lookupCache(r.structCache, int(code-STRUCT_CACHE_PACKED_START)).(StructType)
+		st := lookupCache(r.structCache, int(code-STRUCT_CACHE_PACKED_START)).(StructType)
+		result = r.handleStruct(st.tag, st.fields)
 
 	case MAP:
 		kvs := r.readObject().([]interface{})
