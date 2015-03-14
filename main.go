@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"time"
 )
@@ -288,7 +289,12 @@ func (r *Reader) read(code byte) interface{} {
 	case UUID:
 		result = r.handleStruct("uuid", 2)
 
-		// TODO: REGEX, URI, BIGINT, BIGDEC,
+		// TODO: REGEX
+
+	case URI:
+		result = r.handleStruct("uri", 1)
+
+		// TODO: BIGINT, BIGDEC
 
 	case INST:
 		result = time.Unix(int64(r.readInt()), 0)
@@ -446,6 +452,14 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 			log.Fatal("invalid uuid")
 		}
 		return string(bs)
+
+	case "uri":
+		rawUrl := r.readObject().(string)
+		u, err := url.Parse(rawUrl)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return u
 
 	default:
 		if fieldCount == 6 {
