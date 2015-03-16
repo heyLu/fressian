@@ -105,7 +105,7 @@ type Key struct {
 func (k Key) Key() string          { return "key" }
 func (k Key) Value() []interface{} { return []interface{}{k.Namespace, k.Name} }
 
-type StructType struct {
+type structType struct {
 	tag    string
 	fields int
 }
@@ -115,21 +115,17 @@ type StructAny struct {
 	Values []interface{}
 }
 
-type RawReader struct {
+type rawReader struct {
 	br    *bufio.Reader
 	count int
 	err   error
 }
 
-func newRawReader(r io.Reader) *RawReader {
-	return &RawReader{bufio.NewReader(r), 0, nil}
+func newRawReader(r io.Reader) *rawReader {
+	return &rawReader{bufio.NewReader(r), 0, nil}
 }
 
-func (r *RawReader) Err() error {
-	return r.err
-}
-
-func (r *RawReader) readRawByte() byte {
+func (r *rawReader) readRawByte() byte {
 	res, err := r.br.ReadByte()
 	if err != nil {
 		r.err = err
@@ -139,31 +135,31 @@ func (r *RawReader) readRawByte() byte {
 	return res
 }
 
-func (r *RawReader) readRawInt8() int {
+func (r *rawReader) readRawInt8() int {
 	return int(r.readRawByte())
 }
 
-func (r *RawReader) readRawInt16() int {
+func (r *rawReader) readRawInt16() int {
 	return (int(r.readRawByte()) << 8) + int(r.readRawByte())
 }
 
-func (r *RawReader) readRawInt24() int {
+func (r *rawReader) readRawInt24() int {
 	return (int(r.readRawByte()) << 16) + (int(r.readRawByte()) << 8) + int(r.readRawByte())
 }
 
-func (r *RawReader) readRawInt32() int {
+func (r *rawReader) readRawInt32() int {
 	return (int(r.readRawByte()) << 24) + (int(r.readRawByte()) << 16) + (int(r.readRawByte()) << 8) + int(r.readRawByte())
 }
 
-func (r *RawReader) readRawInt40() int {
+func (r *rawReader) readRawInt40() int {
 	return (r.readRawInt8() << 32) | r.readRawInt32()
 }
 
-func (r *RawReader) readRawInt48() int {
+func (r *rawReader) readRawInt48() int {
 	return (r.readRawInt16() << 32) | r.readRawInt32()
 }
 
-func (r *RawReader) readRawInt64() int {
+func (r *rawReader) readRawInt64() int {
 	return ((int(r.readRawByte()) & 0xff) << 56) |
 		((int(r.readRawByte()) & 0xff) << 48) |
 		((int(r.readRawByte()) & 0xff) << 40) |
@@ -181,7 +177,7 @@ type ReadHandler func(r *Reader, tag string, fieldCount int) interface{}
 
 // Reader reads fressian values from another io.Reader
 type Reader struct {
-	raw           *RawReader
+	raw           *rawReader
 	priorityCache []interface{}
 	structCache   []interface{}
 	handlers      map[string]ReadHandler
@@ -197,7 +193,7 @@ func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
 }
 
 func (r *Reader) err() error {
-	return r.raw.Err()
+	return r.raw.err
 }
 
 // ReadObject reads the next object from the Reader.
@@ -323,7 +319,7 @@ func (r *Reader) read(code byte) interface{} {
 		STRUCT_CACHE_PACKED_START + 10, STRUCT_CACHE_PACKED_START + 11,
 		STRUCT_CACHE_PACKED_START + 12, STRUCT_CACHE_PACKED_START + 13,
 		STRUCT_CACHE_PACKED_START + 14, STRUCT_CACHE_PACKED_START + 15:
-		st := lookupCache(r.structCache, int(code-STRUCT_CACHE_PACKED_START)).(StructType)
+		st := lookupCache(r.structCache, int(code-STRUCT_CACHE_PACKED_START)).(structType)
 		result = r.handleStruct(st.tag, st.fields)
 
 	case MAP:
@@ -477,11 +473,11 @@ func (r *Reader) read(code byte) interface{} {
 	case STRUCTTYPE:
 		tag := r.readObject().(string)
 		fields := r.readInt()
-		r.structCache = append(r.structCache, StructType{tag, fields})
+		r.structCache = append(r.structCache, structType{tag, fields})
 		result = r.handleStruct(tag, fields)
 
 	case STRUCT:
-		st := lookupCache(r.structCache, r.readInt()).(StructType)
+		st := lookupCache(r.structCache, r.readInt()).(structType)
 		result = r.handleStruct(st.tag, st.fields)
 
 	case RESET_CACHES:
