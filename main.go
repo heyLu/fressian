@@ -190,6 +190,10 @@ func (r *Reader) Err() error {
 	return r.raw.Err()
 }
 
+func (r *Reader) ReadObject() (interface{}, error) {
+	return r.readObject(), r.Err()
+}
+
 func (r *Reader) readNextCode() byte {
 	return r.raw.readRawByte()
 }
@@ -753,9 +757,9 @@ func main() {
 	}
 
 	r := NewReader(f)
-	obj := r.readObject()
-	if r.Err() != nil {
-		log.Fatal(r.Err())
+	obj, err := r.ReadObject()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if *pretty {
