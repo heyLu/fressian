@@ -23,7 +23,7 @@ func TestReadInt(t *testing.T) {
 func expectReadInt(t *testing.T, bs []byte, res int) {
 	r := newReader(bs)
 	i := r.readInt()
-	tu.RequireNil(t, r.Err())
+	tu.RequireNil(t, r.err())
 	tu.ExpectEqual(t, i, res)
 }
 
@@ -106,7 +106,7 @@ func TestReadObject(t *testing.T) {
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
 	r := newReader(bs)
 	obj := r.readObject()
-	tu.RequireNil(t, r.Err())
+	tu.RequireNil(t, r.err())
 	tu.ExpectEqual(t, obj, res)
 }
 
@@ -167,7 +167,7 @@ func readObjectTagged(t *testing.T, bs []byte, res Tagged) Tagged {
 func readObject(t *testing.T, bs []byte) interface{} {
 	r := newReader(bs)
 	obj := r.readObject()
-	tu.RequireNil(t, r.Err())
+	tu.RequireNil(t, r.err())
 	return obj
 }
 

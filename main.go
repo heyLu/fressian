@@ -186,12 +186,12 @@ func NewReader(r io.Reader) *Reader {
 	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16)}
 }
 
-func (r *Reader) Err() error {
+func (r *Reader) err() error {
 	return r.raw.Err()
 }
 
 func (r *Reader) ReadObject() (interface{}, error) {
-	return r.readObject(), r.Err()
+	return r.readObject(), r.err()
 }
 
 func (r *Reader) readNextCode() byte {
@@ -542,7 +542,7 @@ func (r *Reader) readOpenList() []interface{} {
 	list := make([]interface{}, 0)
 	for {
 		code := r.readNextCode()
-		if r.Err() == io.EOF {
+		if r.err() == io.EOF {
 			code = END_COLLECTION
 		}
 		if code == END_COLLECTION {
