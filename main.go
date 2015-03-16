@@ -169,18 +169,21 @@ func (r *RawReader) readRawInt64() int {
 		(int(r.readRawByte()) & 0xff)
 }
 
+type ReadHandler func(r *Reader, tag string, fieldCount int) interface{}
+
 type Reader struct {
 	raw           *RawReader
 	priorityCache []interface{}
 	structCache   []interface{}
+	handlers      map[string]ReadHandler
 }
 
 type markerObject struct{}
 
 var UNDER_CONSTRUCTION = markerObject{}
 
-func NewReader(r io.Reader) *Reader {
-	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16)}
+func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
+	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16), handlers}
 }
 
 func (r *Reader) err() error {
@@ -579,6 +582,10 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		return u
 
 	default:
+		if handler, ok := r.handlers[key]; ok {
+			return handler(r, key, fieldCount)
+		}
+
 		vals := r.readObjects(fieldCount)
 		return StructAny{key, vals}
 	}

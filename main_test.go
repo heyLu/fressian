@@ -172,5 +172,5 @@ func readObject(t *testing.T, bs []byte) interface{} {
 }
 
 func newReader(bs []byte) *Reader {
-	return NewReader(bytes.NewReader(bs))
+	return NewReader(bytes.NewReader(bs), nil)
 }
