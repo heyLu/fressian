@@ -96,12 +96,12 @@ type Tagged interface {
 }
 
 type Key struct {
-	namespace string
-	name      string
+	Namespace string
+	Name      string
 }
 
 func (k Key) Key() string          { return "key" }
-func (k Key) Value() []interface{} { return []interface{}{k.namespace, k.name} }
+func (k Key) Value() []interface{} { return []interface{}{k.Namespace, k.Name} }
 
 type StructType struct {
 	tag    string
@@ -557,8 +557,8 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		}
 		name := r.readObject()
 		return Key{
-			namespace: namespace.(string),
-			name:      name.(string),
+			Namespace: namespace.(string),
+			Name:      name.(string),
 		}
 
 	case "uuid":
@@ -606,10 +606,10 @@ func prettySprint(value interface{}) string {
 	case bool, byte, int, float32, float64, string:
 		return fmt.Sprintf("%#v", value)
 	case Key:
-		if value.namespace == "" {
-			return fmt.Sprintf(":%s", value.name)
+		if value.Namespace == "" {
+			return fmt.Sprintf(":%s", value.Name)
 		} else {
-			return fmt.Sprintf(":%s/%s", value.namespace, value.name)
+			return fmt.Sprintf(":%s/%s", value.Namespace, value.Name)
 		}
 	default:
 		log.Fatalf("unexpected value: %#v", value)

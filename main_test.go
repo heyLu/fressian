@@ -100,7 +100,7 @@ func TestReadObject(t *testing.T) {
 	}
 	tu.ExpectEqual(t, date.Unix(), int64(1426182820))
 
-	readObjectTagged(t, []byte{KEY, STRING_PACKED_LENGTH_START + 2, 0x61, 0x62, STRING_PACKED_LENGTH_START + 1, 0x63}, Key{namespace: "ab", name: "c"})
+	readObjectTagged(t, []byte{KEY, STRING_PACKED_LENGTH_START + 2, 0x61, 0x62, STRING_PACKED_LENGTH_START + 1, 0x63}, Key{Namespace: "ab", Name: "c"})
 }
 
 func expectReadObject(t *testing.T, bs []byte, res interface{}) {
