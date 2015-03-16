@@ -185,7 +185,7 @@ type Reader struct {
 
 type markerObject struct{}
 
-var UNDER_CONSTRUCTION = markerObject{}
+var underConstruction = markerObject{}
 
 // NewReader creates a new Reader.
 func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
@@ -286,7 +286,7 @@ func (r *Reader) read(code byte) interface{} {
 
 	case PUT_PRIORITY_CACHE:
 		idx := len(r.priorityCache)
-		r.priorityCache = append(r.priorityCache, UNDER_CONSTRUCTION)
+		r.priorityCache = append(r.priorityCache, underConstruction)
 		r.priorityCache[idx] = r.readObject()
 		result = r.priorityCache[idx]
 
@@ -603,7 +603,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 func lookupCache(cache []interface{}, idx int) interface{} {
 	if idx < len(cache) {
 		obj := cache[idx]
-		if obj == UNDER_CONSTRUCTION {
+		if obj == underConstruction {
 			log.Fatal("circular reference in cache!")
 		} else {
 			return obj
