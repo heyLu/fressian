@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// from org.fressian.impl.Codes
+// Byte codes for the types fressian supports
 const (
 	PRIORITY_CACHE_PACKED_START = 0x80
 	PRIORITY_CACHE_PACKED_END   = 0xA0
@@ -25,7 +25,7 @@ const (
 	INT_ARRAY                   = 0xB3
 	FLOAT_ARRAY                 = 0xB4
 	OBJECT_ARRAY                = 0xB5
-	MAP                         = 0xC0 // so there *is* special support for maps?
+	MAP                         = 0xC0
 	SET                         = 0xC1
 	UUID                        = 0xC3
 	REGEX                       = 0xC4
@@ -89,11 +89,14 @@ const (
 	INT_PACKED_7_END            = 0x80
 )
 
+// Tagged is a generic interface for tagged data.
 type Tagged interface {
 	Key() string
 	Value() []interface{}
 }
 
+// Key represends a fressian keyword, consisting of a namespace (which
+// may be empty) and a name.
 type Key struct {
 	Namespace string
 	Name      string
@@ -171,12 +174,12 @@ func (r *RawReader) readRawInt64() int {
 		(int(r.readRawByte()) & 0xff)
 }
 
-// A handler for reading tagged data, passed as a map to NewReader
-//
-// A handler MUST read fieldCount values when called.
+/* ReadHandler is an alias for custom handlers of tagged data.
+
+A handler MUST read fieldCount values when called.*/
 type ReadHandler func(r *Reader, tag string, fieldCount int) interface{}
 
-// Reads fressian data from another Reader.
+// Reader reads fressian values from another io.Reader
 type Reader struct {
 	raw           *RawReader
 	priorityCache []interface{}
@@ -188,9 +191,7 @@ type markerObject struct{}
 
 var UNDER_CONSTRUCTION = markerObject{}
 
-// Creates a new Reader.
-//
-//	Pass nil as a second argument if you don't have custom ReadHandlers.
+// NewReader creates a new Reader.
 func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
 	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16), handlers}
 }
@@ -199,7 +200,7 @@ func (r *Reader) err() error {
 	return r.raw.Err()
 }
 
-// Read the next object from the Reader.
+// ReadObject reads the next object from the Reader.
 func (r *Reader) ReadObject() (interface{}, error) {
 	return r.readObject(), r.err()
 }
