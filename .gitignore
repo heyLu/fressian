@@ -1,9 +1,5 @@
-/misc/adler32
 /*.fressian
-/main
+/fsn/fsn
 
 # deps/resources
 /fressian
-/data.fressian
-/zlib*
-/rfc*.txt
