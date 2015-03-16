@@ -1,3 +1,5 @@
+// Package fressian supports reading values in the fressian format in
+// Go.
 package fressian
 
 import (
@@ -169,8 +171,12 @@ func (r *RawReader) readRawInt64() int {
 		(int(r.readRawByte()) & 0xff)
 }
 
+// A handler for reading tagged data, passed as a map to NewReader
+//
+// A handler MUST read fieldCount values when called.
 type ReadHandler func(r *Reader, tag string, fieldCount int) interface{}
 
+// Reads fressian data from another Reader.
 type Reader struct {
 	raw           *RawReader
 	priorityCache []interface{}
@@ -182,6 +188,9 @@ type markerObject struct{}
 
 var UNDER_CONSTRUCTION = markerObject{}
 
+// Creates a new Reader.
+//
+//	Pass nil as a second argument if you don't have custom ReadHandlers.
 func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
 	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16), handlers}
 }
@@ -190,6 +199,7 @@ func (r *Reader) err() error {
 	return r.raw.Err()
 }
 
+// Read the next object from the Reader.
 func (r *Reader) ReadObject() (interface{}, error) {
 	return r.readObject(), r.err()
 }
