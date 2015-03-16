@@ -1,4 +1,4 @@
-package main
+package fressian
 
 import (
 	"bytes"
