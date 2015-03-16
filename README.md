@@ -1,31 +1,21 @@
-# Exploring fressian
+# Reading fressian data in Go
 
-Before starting to play, run `make deps` to fetch various dependencies.
+**Caution:** This is very early stages. It can read fressian data, but
+not all of fressian is supported and the API is definitely *not* final
+in any way. Say hi if you try to use it. :)
 
-## Using `Datomic/fressian`
+## Usage
 
-```
-$ pushd fressian; mvn compile; popd
-...
-$ clj -cp fressian/target/classes
-Clojure 1.6.0
-=> (import '(org.fressian FressianReader FressianWriter))
-=> (import '(java.io File FileInputStream FileOutputStream))
-=>
-=> (def f (File. "example.fressian"))
-=>
-=> (def w (FressianWriter. (FileOutputStream f)))
-=> (.writeObject w [1 2 3 4 5])
-=> (.close w)
+`go get github.com/heyLu/fressian`
 
-=> (def r (FressianReader. (FileInputStream. f)))
-=> (.readObject r)
-[1 2 3 4 5]
-=> (.close r)
-```
+- create a reader with `fressian.NewReader(r, nil)`
+- use `.ReadObject()` to read the next object
+- see [./fsn](./fsn/main.go) for an example
 
-Then you can inspect `example.fressian` using `hexdump -C
-example.fressian`, for example.
+## TODO
+
+- improving the API
+- writing fressian data
 
 ## Examples
 
@@ -37,13 +27,13 @@ example.fressian`, for example.
 
     the number is calculated using `(hi - 0x50 << 8) | lo`.
 
-- floating point numbers (32 bit = 4 bytes), `(.writeString w (float 1.2345))`
+- floating point numbers (32 bit = 4 bytes), `(float 1.2345)`
 
                   FLOAT
                   ^
         00000000  f9 3f 9e 04 19                                    |.?...|
         00000005
-- double-precision (64 bit = 8 bytes) floating point numbers, `(.writeString w 3.257329852835)`
+- double-precision (64 bit = 8 bytes) floating point numbers, `3.257329852835`
 
                   DOUBLE
                   ^
@@ -51,13 +41,13 @@ example.fressian`, for example.
         00000009
 
     `0.0` and `1.0` have special encodings, `0xFB` and `0xFC`
-- `(.writeObject w [1 2 3 4 5])`, `.readObject` returns an `ArrayList`
+- `[1 2 3 4 5]`
 
                   LIST_PACKED_LENGTH_START + 5 = 0xe4 + 5
                   ^
         00000000  e9 01 02 03 04 05                                 |......|
         00000006
-- `(.writeObject w [1 2 3 4 5 "hello"])`, also an `ArrayList`
+- `[1 2 3 4 5 "hello"]`
 
                   LIST_PACKED_LENGTH_START + 6 = 0xe4 + 6
                   ^
@@ -65,7 +55,7 @@ example.fressian`, for example.
                   |                 ^
         00000000  ea 01 02 03 04 05 df 68  65 6c 6c 6f              |.......hello|
         0000000c
-- `(.writeObject w {"hey" 3, "ho" 2, "answer" 42})`
+- `{"hey" 3, "ho" 2, "answer" 42}`
 
                      LIST_PACKED_LENGTH_START + 6 = 0xe4 + 6
                      ^
