@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	fressian ".."
+	fressian "github.com/heyLu/fressian"
 )
 
 func prettySprint(value interface{}) string {
