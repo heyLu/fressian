@@ -1,7 +1,4 @@
-build: misc/adler32
-
-misc/adler32: misc/adler32.c
-	clang -lz $< -o $@
+build:
 
 deps:
 	[ -e fressian ] || git clone git://github.com/Datomic/fressian
@@ -11,4 +8,3 @@ deps:
 
 clean:
 	rm -rf fressian data.fressian zlib* rfc*
-	rm -f misc/adler32
