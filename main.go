@@ -174,9 +174,9 @@ func (r *RawReader) readRawInt64() int {
 		(int(r.readRawByte()) & 0xff)
 }
 
-/* ReadHandler is an alias for custom handlers of tagged data.
-
-A handler MUST read fieldCount values when called.*/
+// ReadHandler is an alias for custom handlers of tagged data.
+//
+// A handler MUST read fieldCount values when called.
 type ReadHandler func(r *Reader, tag string, fieldCount int) interface{}
 
 // Reader reads fressian values from another io.Reader
