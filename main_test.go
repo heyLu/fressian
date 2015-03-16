@@ -98,7 +98,7 @@ func TestReadObject(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected a time.Time, but got %#v", obj)
 	}
-	tu.ExpectEqual(t, date.Unix(), int64(1426182819190))
+	tu.ExpectEqual(t, date.Unix(), int64(1426182820))
 
 	readObjectTagged(t, []byte{KEY, STRING_PACKED_LENGTH_START + 2, 0x61, 0x62, STRING_PACKED_LENGTH_START + 1, 0x63}, Key{namespace: "ab", name: "c"})
 }
