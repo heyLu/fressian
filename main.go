@@ -581,8 +581,8 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		return fmt.Sprintf("%x-%x-%x-%x-%x", bs[0:4], bs[4:6], bs[6:8], bs[8:10], bs[10:16])
 
 	case "uri":
-		rawUrl := r.readObject().(string)
-		u, err := url.Parse(rawUrl)
+		rawURL := r.readObject().(string)
+		u, err := url.Parse(rawURL)
 		if err != nil {
 			log.Fatal(err)
 		}
