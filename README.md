@@ -15,6 +15,9 @@ in any way. Say hi if you try to use it. :)
 ## TODO
 
 - improving the API
+    - better error handling (e.g. don't crash on errors)
+    - maybe export `Read{Int,...}` and friends
+- implement the remaining bytecodes
 - writing fressian data
 
 ## Examples
