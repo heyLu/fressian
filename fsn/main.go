@@ -48,6 +48,11 @@ func prettyPrint(indent string, value interface{}) {
 	case map[interface{}]interface{}:
 		fmt.Printf("%s{\n", indent)
 		for key, val := range value {
+			if val == nil {
+				fmt.Printf("%s%s nil\n", indent+"  ", prettySprint(key))
+				continue
+			}
+
 			switch val.(type) {
 			case bool, byte, int, float32, float64, string, fressian.Key:
 				fmt.Printf("%s%s %s\n", indent+"  ", prettySprint(key), prettySprint(val))
