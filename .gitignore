@@ -1,5 +1,4 @@
 /*.fressian
 /fsn/fsn
 
-# deps/resources
-/fressian
+/deps
