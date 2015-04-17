@@ -89,6 +89,10 @@ const (
 	INT_PACKED_7_END            = 0x80
 )
 
+const (
+	BYTE_CHUNK_SIZE = 65535
+)
+
 // Tagged is a generic interface for tagged data.
 type Tagged interface {
 	Key() string
