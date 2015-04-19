@@ -239,9 +239,45 @@ func (w *Writer) writeCount(c int) error {
 	return w.WriteInt(c)
 }
 
+// c.f. java.lang.Long#numberOfLeadingZeros
+func numberOfLeadingZeros(i int) int {
+	if i == 0 {
+		return 64
+	}
+
+	n := 1
+	x := i >> 32
+	if x == 0 {
+		n += 32
+		x = i
+	}
+	if x>>16 == 0 {
+		n += 16
+		x <<= 16
+	}
+	if x>>24 == 0 {
+		n += 8
+		x <<= 8
+	}
+	if x>>28 == 0 {
+		n += 4
+		x <<= 4
+	}
+	if x>>30 == 0 {
+		n += 2
+		x <<= 2
+	}
+	n -= x >> 31
+
+	return n
+}
+
 func bitSwitch(i int) int {
-	log.Fatal("not implemented")
-	return 0
+	if i < 0 {
+		i = ^i
+	}
+
+	return numberOfLeadingZeros(i)
 }
 
 func (w *Writer) internalWriteInt(i int) error {
