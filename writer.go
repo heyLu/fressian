@@ -281,10 +281,27 @@ func (w *Writer) ResetCaches() error {
 	return w.writeCode(RESET_CACHES)
 }
 
-var defaultCodes = map[interface{}]int{}
+var tagToCode = map[interface{}]int{
+/*"map":       MAP,
+"set":       SET,
+"uuid":      UUID,
+"regex":     REGEX,
+"uri":       URI,
+"bigint":    BIGINT,
+"bigdec":    BIGDEC,
+"inst":      INST,
+"sym":       SYM,
+"key":       KEY,
+"int[]":     INT_ARRAY,
+"float[]":   FLOAT_ARRAY,
+"double[]":  DOUBLE_ARRAY,
+"long[]":    LONG_ARRAY,
+"boolean[]": BOOLEAN_ARRAY,
+"Object[]":  OBJECT_ARRAY,*/
+}
 
 func (w *Writer) writeTag(tag interface{}, componentCount int) error {
-	shortcutCode, ok := defaultCodes[tag]
+	shortcutCode, ok := tagToCode[tag]
 	if ok {
 		return w.writeCode(shortcutCode)
 	} else {
