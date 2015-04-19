@@ -2,6 +2,7 @@ package fressian
 
 import (
 	"bufio"
+	"encoding/binary"
 	"errors"
 	"io"
 	"log"
@@ -127,6 +128,26 @@ func (w *rawWriter) writeRawInt64(i int) error {
 	return nil
 }
 
+func (w *rawWriter) writeRawFloat32(f float32) error {
+	err := binary.Write(w.bw, binary.BigEndian, f)
+	if err != nil {
+		w.err = err
+		return err
+	}
+
+	return nil
+}
+
+func (w *rawWriter) writeRawFloat64(f float64) error {
+	err := binary.Write(w.bw, binary.BigEndian, f)
+	if err != nil {
+		w.err = err
+		return err
+	}
+
+	return nil
+}
+
 func (w *rawWriter) writeRawBytes(bytes []byte, offset int, length int) error {
 	n, err := w.bw.Write(bytes[offset : offset+length])
 	if err != nil {
@@ -184,8 +205,13 @@ func (w *Writer) WriteInt(i int) error {
 	return w.internalWriteInt(i)
 }
 
-// WriteFloat (WriteFloat32?)
-// WriteDouble (WriteFloat64?)
+func (w *Writer) WriteFloat32(f float32) error {
+	return w.raw.writeRawFloat32(f)
+}
+
+func (w *Writer) WriteFloat64(f float64) error {
+	return w.raw.writeRawFloat64(f)
+}
 
 // WriteString
 
