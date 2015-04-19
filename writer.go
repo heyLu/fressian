@@ -2,6 +2,7 @@ package fressian
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"log"
 )
@@ -129,8 +130,29 @@ func (w *rawWriter) writeRawBytes(bytes []byte, offset int, length int) error {
 	return nil
 }
 
+func (w *rawWriter) reset() {
+	w.count = 0
+	// TODO: reset checksum
+}
+
+type WriteHandler func(w *Writer, val interface{}) error
+
 type Writer struct {
-	raw *rawWriter
+	raw              *rawWriter
+	priorityCache    map[interface{}]int
+	priorityCacheIdx int
+	structCache      map[interface{}]int
+	structCacheIdx   int
+}
+
+func NewWriter(w io.Writer, handlers map[string]WriteHandler) *Writer {
+	return &Writer{
+		newRawWriter(w),
+		make(map[interface{}]int, 16), // TODO: fix these numbers
+		0,
+		make(map[interface{}]int, 16),
+		0,
+	}
 }
 
 func (w *Writer) WriteNil() error {
@@ -247,10 +269,121 @@ func (w *Writer) internalWriteInt(i int) error {
 	}
 }
 
-// WriteAs
+func (w *Writer) clearCaches() {
+	w.priorityCache = make(map[interface{}]int, 16)
+	w.priorityCacheIdx = 0
+	w.structCache = make(map[interface{}]int, 16)
+	w.structCacheIdx = 0
+}
+
+func (w *Writer) ResetCaches() error {
+	w.clearCaches()
+	return w.writeCode(RESET_CACHES)
+}
+
+var defaultCodes = map[interface{}]int{}
+
+func (w *Writer) writeTag(tag interface{}, componentCount int) error {
+	shortcutCode, ok := defaultCodes[tag]
+	if ok {
+		return w.writeCode(shortcutCode)
+	} else {
+		idx, ok := w.structCache[tag]
+		if !ok {
+			w.structCache[tag] = w.structCacheIdx
+			w.structCacheIdx += 1
+			w.writeCode(STRUCTTYPE)
+			w.WriteObject(tag)
+			return w.WriteInt(componentCount)
+		} else if idx < STRUCT_CACHE_PACKED_END {
+			return w.writeCode(STRUCT_CACHE_PACKED_START + idx)
+		} else {
+			w.writeCode(STRUCT)
+			return w.WriteInt(idx)
+		}
+	}
+}
+
+func (w *Writer) WriteExt(tag interface{}, fields ...interface{}) error {
+	w.writeTag(tag, len(fields))
+	for _, field := range fields {
+		w.WriteObject(field)
+	}
+	return w.raw.err
+}
+
+func shouldSkipCache(val interface{}) bool {
+	if val == nil {
+		return true
+	}
+
+	switch val := val.(type) {
+	case bool:
+		return true
+	case int:
+		switch bitSwitch(val) {
+		case 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64:
+			return true
+		default:
+			return false
+		}
+	case string:
+		return len(val) == 0
+	case float64:
+		return val == 0.0 || val == 1.0
+	default:
+		return false
+	}
+}
+
+func (w *Writer) doWrite(tag string, val interface{}, wh WriteHandler, cache bool) error {
+	if cache {
+		if shouldSkipCache(val) {
+			return w.doWrite(tag, val, wh, false)
+		} else {
+			idx, ok := w.priorityCache[val]
+			if !ok {
+				w.priorityCache[tag] = w.priorityCacheIdx
+				w.priorityCacheIdx += 1
+				w.writeCode(PUT_PRIORITY_CACHE)
+				return w.doWrite(tag, val, wh, false)
+			} else if idx < PRIORITY_CACHE_PACKED_END {
+				return w.writeCode(PRIORITY_CACHE_PACKED_START + idx)
+			} else {
+				w.writeCode(GET_PRIORITY_CACHE)
+				return w.WriteInt(idx)
+			}
+		}
+	} else {
+		return w.WriteObject(val)
+	}
+}
+
+func (w *Writer) WriteAs(tag string, val interface{}, cache bool) error {
+	// TODO: lookup handler
+	return w.doWrite(tag, val, nil, cache)
+}
 
 // WriteAny or even Write?
-func (w *Writer) WriteObject(o interface{}) error {
-	log.Fatal("not implemented")
-	return nil
+func (w *Writer) WriteObject(val interface{}) error {
+	// TODO: "" should be nil
+	return w.WriteAs("", val, false)
+}
+
+func (w *Writer) BeginClosedList() error {
+	return w.writeCode(BEGIN_CLOSED_LIST)
+}
+
+func (w *Writer) EndList() error {
+	return w.writeCode(END_COLLECTION)
+}
+
+func (w *Writer) BeginOpenList() error {
+	if w.raw.count != 0 {
+		return errors.New("open list must be called from the top level, outside any footer context")
+	}
+
+	err := w.writeCode(BEGIN_OPEN_LIST)
+	w.raw.reset()
+	return err
 }
