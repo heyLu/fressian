@@ -413,3 +413,11 @@ func (w *Writer) BeginOpenList() error {
 	w.raw.reset()
 	return err
 }
+
+func (w *Writer) Error() error {
+	return w.raw.err
+}
+
+func (w *Writer) Flush() error {
+	return w.raw.bw.Flush()
+}
