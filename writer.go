@@ -20,6 +20,7 @@ func newRawWriter(w io.Writer) *rawWriter {
 func (w *rawWriter) writeRawByte(b byte) error {
 	err := w.bw.WriteByte(b)
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -32,6 +33,7 @@ func (w *rawWriter) writeRawInt16(i int) error {
 		byte((i >> 8) & 0xff),
 		byte(i & 0xff)})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -46,6 +48,7 @@ func (w *rawWriter) writeRawInt24(i int) error {
 		byte(i & 0xff),
 	})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -61,6 +64,7 @@ func (w *rawWriter) writeRawInt32(i int) error {
 		byte(i & 0xff),
 	})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -77,6 +81,7 @@ func (w *rawWriter) writeRawInt40(i int) error {
 		byte(i & 0xff),
 	})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -94,6 +99,7 @@ func (w *rawWriter) writeRawInt48(i int) error {
 		byte(i & 0xff),
 	})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -113,6 +119,7 @@ func (w *rawWriter) writeRawInt64(i int) error {
 		byte(i & 0xff),
 	})
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -123,6 +130,7 @@ func (w *rawWriter) writeRawInt64(i int) error {
 func (w *rawWriter) writeRawBytes(bytes []byte, offset int, length int) error {
 	n, err := w.bw.Write(bytes[offset : offset+length])
 	if err != nil {
+		w.err = err
 		return err
 	}
 
@@ -132,6 +140,7 @@ func (w *rawWriter) writeRawBytes(bytes []byte, offset int, length int) error {
 
 func (w *rawWriter) reset() {
 	w.count = 0
+	//w.err = nil
 	// TODO: reset checksum
 }
 
