@@ -171,15 +171,20 @@ type Writer struct {
 	priorityCacheIdx int
 	structCache      map[interface{}]int
 	structCacheIdx   int
+	handler          WriteHandler
 }
 
-func NewWriter(w io.Writer, handlers map[string]WriteHandler) *Writer {
+func NewWriter(w io.Writer, handler WriteHandler) *Writer {
+	if handler == nil {
+		handler = DefaultHandler
+	}
 	return &Writer{
 		newRawWriter(w),
 		make(map[interface{}]int, 16), // TODO: fix these numbers
 		0,
 		make(map[interface{}]int, 16),
 		0,
+		handler,
 	}
 }
 
@@ -444,13 +449,13 @@ func (w *Writer) doWrite(tag string, val interface{}, wh WriteHandler, cache boo
 			}
 		}
 	} else {
-		return w.WriteObject(val)
+		return wh(w, val)
 	}
 }
 
 func (w *Writer) WriteAs(tag string, val interface{}, cache bool) error {
 	// TODO: lookup handler
-	return w.doWrite(tag, val, nil, cache)
+	return w.doWrite(tag, val, w.handler, cache)
 }
 
 // WriteAny or even Write?
