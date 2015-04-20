@@ -234,7 +234,7 @@ func (w *Writer) WriteList(l []interface{}) error {
 		w.writeCount(length)
 	}
 	for _, o := range l {
-		w.WriteObject(o)
+		w.WriteValue(o)
 	}
 	return w.raw.err
 }
@@ -387,7 +387,7 @@ func (w *Writer) writeTag(tag interface{}, componentCount int) error {
 			w.structCache[tag] = w.structCacheIdx
 			w.structCacheIdx += 1
 			w.writeCode(STRUCTTYPE)
-			w.WriteObject(tag)
+			w.WriteValue(tag)
 			return w.WriteInt(componentCount)
 		} else if idx < STRUCT_CACHE_PACKED_END {
 			return w.writeCode(STRUCT_CACHE_PACKED_START + idx)
@@ -401,7 +401,7 @@ func (w *Writer) writeTag(tag interface{}, componentCount int) error {
 func (w *Writer) WriteExt(tag interface{}, fields ...interface{}) error {
 	w.writeTag(tag, len(fields))
 	for _, field := range fields {
-		w.WriteObject(field)
+		w.WriteValue(field)
 	}
 	return w.raw.err
 }
@@ -459,7 +459,7 @@ func (w *Writer) WriteAs(tag string, val interface{}, cache bool) error {
 }
 
 // WriteAny or even Write?
-func (w *Writer) WriteObject(val interface{}) error {
+func (w *Writer) WriteValue(val interface{}) error {
 	// TODO: "" should be nil
 	return w.WriteAs("", val, false)
 }

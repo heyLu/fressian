@@ -22,7 +22,7 @@ func testWriteBool(t *testing.T, b bool) {
 	tu.ExpectNil(t, w.Error())
 
 	r := NewReader(buf, nil)
-	val, err := r.ReadObject()
+	val, err := r.ReadValue()
 	tu.ExpectNil(t, err)
 	tu.ExpectEqual(t, b, val)
 }
@@ -44,30 +44,30 @@ func testWriteInt(t *testing.T, i int) {
 	tu.ExpectNil(t, w.Error())
 
 	r := NewReader(buf, nil)
-	val, err := r.ReadObject()
+	val, err := r.ReadValue()
 	tu.ExpectNil(t, err)
 	tu.ExpectEqual(t, i, val)
 }
 
-func TestWriteObject(t *testing.T) {
-	testWriteObject(t, nil)
-	testWriteObject(t, true)
-	testWriteObject(t, false)
-	testWriteObject(t, 3)
-	//testWriteObject(t, []int{1, 2, 3})
-	testWriteObject(t, []interface{}{1, 2, true, 4})
+func TestWriteValue(t *testing.T) {
+	testWriteValue(t, nil)
+	testWriteValue(t, true)
+	testWriteValue(t, false)
+	testWriteValue(t, 3)
+	//testWriteValue(t, []int{1, 2, 3})
+	testWriteValue(t, []interface{}{1, 2, true, 4})
 }
 
-func testWriteObject(t *testing.T, val interface{}) {
+func testWriteValue(t *testing.T, val interface{}) {
 	buf := new(bytes.Buffer)
 	w := NewWriter(buf, nil)
-	w.WriteObject(val)
+	w.WriteValue(val)
 	w.Flush()
 
 	tu.ExpectNil(t, w.Error())
 
 	r := NewReader(buf, nil)
-	res, err := r.ReadObject()
+	res, err := r.ReadValue()
 	tu.ExpectNil(t, err)
 	if !reflect.DeepEqual(val, res) {
 		t.Errorf("Expected reflect.DeepEqual(%#v, %#v)", val, res)

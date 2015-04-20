@@ -171,7 +171,7 @@ func main() {
 	}
 
 	r := fressian.NewReader(f, nil)
-	obj, err := r.ReadObject()
+	obj, err := r.ReadValue()
 	if err != nil {
 		log.Fatal(err)
 	}

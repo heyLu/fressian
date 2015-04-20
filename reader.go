@@ -200,9 +200,9 @@ func (r *Reader) err() error {
 	return r.raw.err
 }
 
-// ReadObject reads the next object from the Reader.
-func (r *Reader) ReadObject() (interface{}, error) {
-	return r.readObject(), r.err()
+// ReadValue reads the next object from the Reader.
+func (r *Reader) ReadValue() (interface{}, error) {
+	return r.readValue(), r.err()
 }
 
 func (r *Reader) readNextCode() byte {
@@ -255,7 +255,7 @@ func (r *Reader) readInt() int {
 	return result
 }
 
-func (r *Reader) readObject() interface{} {
+func (r *Reader) readValue() interface{} {
 	return r.read(r.readNextCode())
 }
 
@@ -291,7 +291,7 @@ func (r *Reader) read(code byte) interface{} {
 	case PUT_PRIORITY_CACHE:
 		idx := len(r.priorityCache)
 		r.priorityCache = append(r.priorityCache, underConstruction)
-		r.priorityCache[idx] = r.readObject()
+		r.priorityCache[idx] = r.readValue()
 		result = r.priorityCache[idx]
 
 	case GET_PRIORITY_CACHE:
@@ -327,7 +327,7 @@ func (r *Reader) read(code byte) interface{} {
 		result = r.handleStruct(st.tag, st.fields)
 
 	case MAP:
-		kvs := r.readObject().([]interface{})
+		kvs := r.readValue().([]interface{})
 		m := make(map[interface{}]interface{}, len(kvs)/2)
 		for i := 0; i < len(kvs); i += 2 {
 			m[kvs[i]] = kvs[i+1]
@@ -367,7 +367,7 @@ func (r *Reader) read(code byte) interface{} {
 		length := r.readCount()
 		floats := make([]float32, length)
 		for i := 0; i < length; i++ {
-			floats[i] = r.readObject().(float32)
+			floats[i] = r.readValue().(float32)
 		}
 		result = floats
 
@@ -375,7 +375,7 @@ func (r *Reader) read(code byte) interface{} {
 		length := r.readCount()
 		bools := make([]bool, length)
 		for i := 0; i < length; i++ {
-			bools[i] = r.readObject().(bool)
+			bools[i] = r.readValue().(bool)
 		}
 		result = bools
 
@@ -383,12 +383,12 @@ func (r *Reader) read(code byte) interface{} {
 		length := r.readCount()
 		doubles := make([]float64, length)
 		for i := 0; i < length; i++ {
-			doubles[i] = r.readObject().(float64)
+			doubles[i] = r.readValue().(float64)
 		}
 		result = doubles
 
 	case OBJECT_ARRAY:
-		result = r.readObjects(r.readCount())
+		result = r.readValues(r.readCount())
 
 	case BYTES_PACKED_LENGTH_START + 0, BYTES_PACKED_LENGTH_START + 1,
 		BYTES_PACKED_LENGTH_START + 2, BYTES_PACKED_LENGTH_START + 3,
@@ -429,13 +429,13 @@ func (r *Reader) read(code byte) interface{} {
 		length := int(code - LIST_PACKED_LENGTH_START)
 		list := make([]interface{}, length)
 		for i := 0; i < length; i++ {
-			list[i] = r.readObject()
+			list[i] = r.readValue()
 		}
 		result = list
 
 	case LIST:
 		length := r.readCount()
-		result = r.readObjects(length)
+		result = r.readValues(length)
 
 	case BEGIN_CLOSED_LIST:
 		result = r.readClosedList()
@@ -475,7 +475,7 @@ func (r *Reader) read(code byte) interface{} {
 		// TODO: FOOTER
 
 	case STRUCTTYPE:
-		tag := r.readObject().(string)
+		tag := r.readValue().(string)
 		fields := r.readInt()
 		r.structCache = append(r.structCache, structType{tag, fields})
 		result = r.handleStruct(tag, fields)
@@ -487,7 +487,7 @@ func (r *Reader) read(code byte) interface{} {
 	case RESET_CACHES:
 		r.priorityCache = make([]interface{}, 0, 32)
 		r.structCache = make([]interface{}, 0, 16)
-		result = r.readObject()
+		result = r.readValue()
 
 	default:
 		log.Fatalf("not implemented or invalid: 0x%x\n", code)
@@ -500,10 +500,10 @@ func (r *Reader) readCount() int {
 	return r.readInt()
 }
 
-func (r *Reader) readObjects(length int) []interface{} {
+func (r *Reader) readValues(length int) []interface{} {
 	list := make([]interface{}, length)
 	for i := 0; i < length; i++ {
-		list[i] = r.readObject()
+		list[i] = r.readValue()
 	}
 	return list
 }
@@ -566,18 +566,18 @@ func (r *Reader) readOpenList() []interface{} {
 func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 	switch key {
 	case "key":
-		namespace := r.readObject()
+		namespace := r.readValue()
 		if namespace == nil {
 			namespace = ""
 		}
-		name := r.readObject()
+		name := r.readValue()
 		return Key{
 			Namespace: namespace.(string),
 			Name:      name.(string),
 		}
 
 	case "uuid":
-		obj := r.readObject()
+		obj := r.readValue()
 		bs, ok := obj.([]byte)
 		if !ok || len(bs) != 16 {
 			log.Fatal("invalid uuid")
@@ -585,7 +585,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		return fmt.Sprintf("%x-%x-%x-%x-%x", bs[0:4], bs[4:6], bs[6:8], bs[8:10], bs[10:16])
 
 	case "uri":
-		rawURL := r.readObject().(string)
+		rawURL := r.readValue().(string)
 		u, err := url.Parse(rawURL)
 		if err != nil {
 			log.Fatal(err)
@@ -597,7 +597,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 			return handler(r, key, fieldCount)
 		}
 
-		vals := r.readObjects(fieldCount)
+		vals := r.readValues(fieldCount)
 		return StructAny{key, vals}
 	}
 

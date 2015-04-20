@@ -9,7 +9,7 @@ in any way. Say hi if you try to use it. :)
 `go get github.com/heyLu/fressian`
 
 - create a reader with `fressian.NewReader(r, nil)`
-- use `.ReadObject()` to read the next object
+- use `.ReadValue()` to read the next object
 - see [./fsn](./fsn/main.go) for an example
 
 ## TODO
