@@ -213,7 +213,10 @@ func (w *Writer) WriteFloat64(f float64) error {
 	return w.raw.writeRawFloat64(f)
 }
 
-// WriteString
+func (w *Writer) WriteString(s string) error {
+	log.Fatal("WriteString: not implemented")
+	return nil
+}
 
 func (w *Writer) WriteList(l []interface{}) error {
 	if l == nil {
