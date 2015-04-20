@@ -165,8 +165,6 @@ func (w *rawWriter) reset() {
 	// TODO: reset checksum
 }
 
-type WriteHandler func(w *Writer, val interface{}) error
-
 type Writer struct {
 	raw              *rawWriter
 	priorityCache    map[interface{}]int
