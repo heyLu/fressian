@@ -99,7 +99,7 @@ type Tagged interface {
 	Value() []interface{}
 }
 
-// Key represends a fressian keyword, consisting of a namespace (which
+// Key represents a fressian keyword, consisting of a namespace (which
 // may be empty) and a name.
 type Key struct {
 	Namespace string
