@@ -10,7 +10,7 @@ in any way. Say hi if you try to use it. :)
 
 - create a reader with `fressian.NewReader(r, nil)`
 - use `.ReadValue()` to read the next object
-- see [./fsn](./fsn/main.go) for an example
+- see [./cmd/fsn](./cmd/fsn/main.go) for an example
 
 ## TODO
 
