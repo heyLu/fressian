@@ -2,6 +2,7 @@ package fressian
 
 import (
 	"bytes"
+	"reflect"
 	"testing"
 
 	tu "github.com/klingtnet/gol/util/testing"
@@ -46,4 +47,29 @@ func testWriteInt(t *testing.T, i int) {
 	val, err := r.ReadObject()
 	tu.ExpectNil(t, err)
 	tu.ExpectEqual(t, i, val)
+}
+
+func TestWriteObject(t *testing.T) {
+	testWriteObject(t, nil)
+	testWriteObject(t, true)
+	testWriteObject(t, false)
+	testWriteObject(t, 3)
+	//testWriteObject(t, []int{1, 2, 3})
+	testWriteObject(t, []interface{}{1, 2, true, 4})
+}
+
+func testWriteObject(t *testing.T, val interface{}) {
+	buf := new(bytes.Buffer)
+	w := NewWriter(buf, nil)
+	w.WriteObject(val)
+	w.Flush()
+
+	tu.ExpectNil(t, w.Error())
+
+	r := NewReader(buf, nil)
+	res, err := r.ReadObject()
+	tu.ExpectNil(t, err)
+	if !reflect.DeepEqual(val, res) {
+		t.Errorf("Expected reflect.DeepEqual(%#v, %#v)", val, res)
+	}
 }
