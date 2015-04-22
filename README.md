@@ -1,8 +1,8 @@
 # Reading fressian data in Go
 
-**Caution:** This is very early stages. It can read fressian data, but
-not all of fressian is supported and the API is definitely *not* final
-in any way. Say hi if you try to use it. :)
+**Caution:** This is very early stages. It can read and write fressian
+data, but not all of fressian is supported and the API is definitely
+*not* final in any way. Say hi if you try to use it. :)
 
 ## Usage
 
@@ -18,7 +18,6 @@ in any way. Say hi if you try to use it. :)
     - better error handling (e.g. don't crash on errors)
     - maybe export `Read{Int,...}` and friends
 - implement the remaining bytecodes
-- writing fressian data
 
 ## Examples
 

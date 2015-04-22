@@ -1,5 +1,5 @@
-// Package fressian supports reading values in the fressian format in
-// Go.
+// Package fressian supports reading and writing values in the fressian
+// format.
 package fressian
 
 import (
