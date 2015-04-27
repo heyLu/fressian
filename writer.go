@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"log"
+	"unicode/utf8"
 )
 
 type rawWriter struct {
@@ -216,9 +217,58 @@ func (w *Writer) WriteFloat64(f float64) error {
 	return w.raw.writeRawFloat64(f)
 }
 
+const (
+	STRING_PACKED_LENGTH_MAX = 8
+	STRING_CHUNK_LENGTH_MAX  = 65536 // 1 << 16
+)
+
 func (w *Writer) WriteString(s string) error {
-	log.Fatal("WriteString: not implemented")
-	return nil
+	stringPos := 0
+	bufPos := 0
+	bufSize := STRING_CHUNK_LENGTH_MAX
+	if len(s) < bufSize {
+		bufSize = len(s)
+	}
+	buf := make([]byte, bufSize)
+
+	for {
+		stringPos, bufPos = encodeToBuffer(s, stringPos, buf)
+		if bufPos < STRING_PACKED_LENGTH_MAX {
+			w.raw.writeRawByte(STRING_PACKED_LENGTH_START + byte(bufPos))
+		} else if stringPos == len(s) {
+			w.writeCode(STRING)
+			w.writeCount(bufPos)
+		} else {
+			w.writeCode(STRING_CHUNK)
+			w.writeCount(bufPos)
+		}
+		w.raw.writeRawBytes(buf, 0, bufPos)
+
+		if stringPos >= len(s) {
+			break
+		}
+	}
+
+	return w.raw.err
+}
+
+// put as many (full) runes into buf as possible.  assumes s contains
+// only valid runes.
+func encodeToBuffer(s string, start int, buf []byte) (int, int) {
+	bufPos := 0
+	stringPos := start
+	for _, ch := range s[start:] {
+		encodedSize := utf8.RuneLen(ch)
+		if bufPos+encodedSize > len(buf) {
+			break
+		}
+
+		utf8.EncodeRune(buf[bufPos:], ch)
+		bufPos += encodedSize
+		stringPos += encodedSize
+	}
+
+	return stringPos, bufPos
 }
 
 func (w *Writer) WriteList(l []interface{}) error {
