@@ -434,7 +434,7 @@ func (w *Writer) writeTag(tag interface{}, componentCount int) error {
 			w.writeCode(STRUCTTYPE)
 			w.WriteValue(tag)
 			return w.WriteInt(componentCount)
-		} else if idx < STRUCT_CACHE_PACKED_END {
+		} else if idx < STRUCT_CACHE_MAX_SIZE {
 			return w.writeCode(STRUCT_CACHE_PACKED_START + idx)
 		} else {
 			w.writeCode(STRUCT)
