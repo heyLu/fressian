@@ -57,6 +57,7 @@ func TestWriteValue(t *testing.T) {
 	//testWriteValue(t, []int{1, 2, 3})
 	testWriteValue(t, "hello")
 	testWriteValue(t, "Hello, World!")
+	testWriteValue(t, Key{"hello", "world"})
 	testWriteValue(t, []interface{}{1, 2, true, 4})
 }
 
