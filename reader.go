@@ -19,15 +19,15 @@ type Tagged interface {
 	Value() []interface{}
 }
 
-// Key represents a fressian keyword, consisting of a namespace (which
-// may be empty) and a name.
-type Key struct {
+// Keyword represents a fressian keyword, consisting of a namespace
+// (which may be empty) and a name.
+type Keyword struct {
 	Namespace string
 	Name      string
 }
 
-func (k Key) Key() string          { return "key" }
-func (k Key) Value() []interface{} { return []interface{}{k.Namespace, k.Name} }
+func (k Keyword) Key() string          { return "key" }
+func (k Keyword) Value() []interface{} { return []interface{}{k.Namespace, k.Name} }
 
 type structType struct {
 	tag    string
@@ -491,7 +491,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 			namespace = ""
 		}
 		name := r.readValue()
-		return Key{
+		return Keyword{
 			Namespace: namespace.(string),
 			Name:      name.(string),
 		}

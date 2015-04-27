@@ -59,7 +59,7 @@ func TestWriteValue(t *testing.T) {
 	testWriteValue(t, "hällo")
 	testWriteValue(t, "日本語")
 	testWriteValue(t, "Hello, World!")
-	testWriteValue(t, Key{"hello", "world"})
+	testWriteValue(t, Keyword{"hello", "world"})
 	testWriteValue(t, []interface{}{1, 2, true, 4})
 }
 

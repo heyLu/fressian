@@ -31,7 +31,7 @@ func DefaultHandler(w *Writer, val interface{}) error {
 		return w.WriteFloat64(val)
 	case string:
 		return w.WriteString(val)
-	case Key:
+	case Keyword:
 		w.writeCode(KEY)
 		w.WriteValue(val.Namespace)
 		return w.WriteValue(val.Name)
