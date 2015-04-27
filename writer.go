@@ -217,15 +217,10 @@ func (w *Writer) WriteFloat64(f float64) error {
 	return w.raw.writeRawFloat64(f)
 }
 
-const (
-	STRING_PACKED_LENGTH_MAX = 8
-	STRING_CHUNK_LENGTH_MAX  = 65536 // 1 << 16
-)
-
 func (w *Writer) WriteString(s string) error {
 	stringPos := 0
 	bufPos := 0
-	bufSize := STRING_CHUNK_LENGTH_MAX
+	bufSize := STRING_CHUNK_MAX_SIZE
 	if len(s) < bufSize {
 		bufSize = len(s)
 	}
@@ -233,7 +228,7 @@ func (w *Writer) WriteString(s string) error {
 
 	for {
 		stringPos, bufPos = encodeToBuffer(s, stringPos, buf)
-		if bufPos < STRING_PACKED_LENGTH_MAX {
+		if bufPos < STRING_PACKED_MAX_SIZE {
 			w.raw.writeRawByte(STRING_PACKED_LENGTH_START + byte(bufPos))
 		} else if stringPos == len(s) {
 			w.writeCode(STRING)
