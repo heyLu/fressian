@@ -55,6 +55,7 @@ func TestWriteValue(t *testing.T) {
 	testWriteValue(t, false)
 	testWriteValue(t, 3)
 	//testWriteValue(t, []int{1, 2, 3})
+	testWriteValue(t, "")
 	testWriteValue(t, "hello")
 	testWriteValue(t, "hällo")
 	testWriteValue(t, "日本語")
