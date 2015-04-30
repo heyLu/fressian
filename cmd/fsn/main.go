@@ -18,7 +18,7 @@ func prettySprint(value interface{}) string {
 	switch value := value.(type) {
 	case bool, byte, int, float32, float64, string:
 		return fmt.Sprintf("%#v", value)
-	case fressian.Key:
+	case fressian.Keyword:
 		if value.Namespace == "" {
 			return fmt.Sprintf(":%s", value.Name)
 		} else {
@@ -54,7 +54,7 @@ func prettyPrint(indent string, value interface{}) {
 			}
 
 			switch val.(type) {
-			case bool, byte, int, float32, float64, string, fressian.Key:
+			case bool, byte, int, float32, float64, string, fressian.Keyword:
 				fmt.Printf("%s%s %s\n", indent+"  ", prettySprint(key), prettySprint(val))
 			default:
 				prettyPrint(indent+"  ", key)
@@ -125,7 +125,7 @@ func prettyPrint(indent string, value interface{}) {
 			}
 		}
 
-	case fressian.Key:
+	case fressian.Keyword:
 		fmt.Printf("%s%s\n", indent, prettySprint(value))
 
 	default:
