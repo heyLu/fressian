@@ -272,7 +272,7 @@ func (w *Writer) WriteList(l []interface{}) error {
 	}
 
 	length := len(l)
-	if length < LIST_PACKED_LENGTH_END {
+	if length < LIST_PACKED_MAX_SIZE {
 		w.raw.writeRawByte(byte(LIST_PACKED_LENGTH_START + length))
 	} else {
 		w.writeCode(LIST)
@@ -293,7 +293,7 @@ func (w *Writer) WriteBytes(bytes []byte) error {
 }
 
 func (w *Writer) WriteBytes_(bytes []byte, offset int, length int) error {
-	if length < BYTES_PACKED_LENGTH_END {
+	if length < BYTES_PACKED_MAX_SIZE {
 		w.raw.writeRawByte(byte(BYTES_PACKED_LENGTH_START + length))
 		w.raw.writeRawBytes(bytes, offset, length)
 	} else {
