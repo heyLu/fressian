@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 )
 
 type WriteHandler func(w *Writer, val interface{}) error
@@ -35,6 +36,9 @@ func DefaultHandler(w *Writer, val interface{}) error {
 		w.writeCode(KEY)
 		w.WriteValue(val.Namespace)
 		return w.WriteValue(val.Name)
+	case time.Time:
+		w.writeCode(INST)
+		return w.WriteInt(int(val.Unix() * 1000))
 	case []interface{}:
 		return w.WriteList(val)
 	default:
