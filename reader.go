@@ -5,6 +5,7 @@ package fressian
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -114,6 +115,14 @@ var underConstruction = markerObject{}
 // NewReader creates a new Reader.
 func NewReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
 	return &Reader{newRawReader(r), make([]interface{}, 0, 32), make([]interface{}, 0, 16), handlers}
+}
+
+func NewGzipReader(r io.Reader, handlers map[string]ReadHandler) *Reader {
+	r, err := gzip.NewReader(r)
+	if err != nil {
+		log.Fatal("NewGzipReader: ", err)
+	}
+	return NewReader(r, handlers)
 }
 
 func (r *Reader) err() error {

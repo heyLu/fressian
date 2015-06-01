@@ -2,6 +2,7 @@ package fressian
 
 import (
 	"bufio"
+	"compress/gzip"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -186,6 +187,19 @@ func NewWriter(w io.Writer, handler WriteHandler) *Writer {
 		make(map[interface{}]int, 16),
 		0,
 		handler,
+	}
+}
+
+type GzipWriter struct {
+	*Writer
+	gzipWriter *gzip.Writer
+}
+
+func NewGzipWriter(w io.Writer, handler WriteHandler) *GzipWriter {
+	gzipWriter := gzip.NewWriter(w)
+	return &GzipWriter{
+		NewWriter(gzipWriter, handler),
+		gzipWriter,
 	}
 }
 
@@ -533,4 +547,12 @@ func (w *Writer) Error() error {
 
 func (w *Writer) Flush() error {
 	return w.raw.bw.Flush()
+}
+
+func (w *GzipWriter) Flush() error {
+	err := w.Writer.Flush()
+	if err != nil {
+		return err
+	}
+	return w.gzipWriter.Flush()
 }

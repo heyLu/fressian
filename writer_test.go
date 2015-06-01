@@ -79,3 +79,20 @@ func testWriteValue(t *testing.T, val interface{}) {
 		t.Errorf("Expected reflect.DeepEqual(%#v, %#v)", val, res)
 	}
 }
+
+func TestGzipWriter(t *testing.T) {
+	buf := new(bytes.Buffer)
+
+	w := NewGzipWriter(buf, nil)
+	val := []interface{}{"hello", "stranger", 5, Keyword{"is", "a"}, "pretty", 7}
+	w.WriteValue(val)
+	w.Flush()
+	tu.ExpectNil(t, w.Error())
+
+	r := NewGzipReader(buf, nil)
+	res, err := r.ReadValue()
+	tu.ExpectNil(t, err)
+	if !reflect.DeepEqual(val, res) {
+		t.Errorf("%#v != %#v", val, res)
+	}
+}
