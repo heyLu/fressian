@@ -37,5 +37,5 @@ func (u UUID) Bytes() []byte {
 
 func (u UUID) String() string {
 	buf := u.Bytes()
-	return fmt.Sprintf("#uuid \"%x-%x-%x-%x-%x\"", buf[0:4], buf[4:6], buf[6:8], buf[8:10], buf[10:])
+	return fmt.Sprintf("%x-%x-%x-%x-%x", buf[0:4], buf[4:6], buf[6:8], buf[8:10], buf[10:])
 }
