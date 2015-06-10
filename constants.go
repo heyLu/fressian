@@ -14,7 +14,7 @@ const (
 	OBJECT_ARRAY                = 0xB5
 	MAP                         = 0xC0
 	SET                         = 0xC1
-	UUID                        = 0xC3
+	CODE_UUID                   = 0xC3
 	REGEX                       = 0xC4
 	URI                         = 0xC5
 	BIGINT                      = 0xC6

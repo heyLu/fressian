@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
 	"net/url"
@@ -265,7 +264,7 @@ func (r *Reader) read(code byte) interface{} {
 
 		// TODO: SET
 
-	case UUID:
+	case CODE_UUID:
 		result = r.handleStruct("uuid", 2)
 
 		// TODO: REGEX
@@ -511,7 +510,7 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 		if !ok || len(bs) != 16 {
 			log.Fatal("invalid uuid")
 		}
-		return fmt.Sprintf("%x-%x-%x-%x-%x", bs[0:4], bs[4:6], bs[6:8], bs[8:10], bs[10:16])
+		return NewUUIDFromBytes(bs)
 
 	case "uri":
 		rawURL := r.readValue().(string)
