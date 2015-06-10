@@ -36,6 +36,9 @@ func DefaultHandler(w *Writer, val interface{}) error {
 		w.writeCode(KEY)
 		w.WriteValue(val.Namespace)
 		return w.WriteValue(val.Name)
+	case UUID:
+		w.writeCode(CODE_UUID)
+		w.WriteValue(val.Bytes())
 	case time.Time:
 		w.writeCode(INST)
 		return w.WriteInt(int(val.Unix() * 1000))
