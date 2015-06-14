@@ -59,8 +59,8 @@ func DefaultHandler(w *Writer, val interface{}) error {
 			ks := val.MapKeys()
 			kvs := make([]interface{}, len(ks)*2)
 			for i, k := range ks {
-				kvs[i] = k
-				kvs[i+1] = val.MapIndex(k)
+				kvs[i*2] = k.Interface()
+				kvs[i*2+1] = val.MapIndex(k).Interface()
 			}
 			w.writeCode(MAP)
 			return w.WriteList(kvs)
