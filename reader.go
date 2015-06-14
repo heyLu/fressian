@@ -31,9 +31,9 @@ func (k Keyword) Value() []interface{} { return []interface{}{k.Namespace, k.Nam
 
 func (k Keyword) String() string {
 	if k.Namespace == "" {
-		return fmt.Sprintf(":%s", k.Name)
+		return ":" + k.Name
 	} else {
-		return fmt.Sprintf(":%s/%s", k.Namespace, k.Name)
+		return ":" + k.Namespace + "/" + k.Name
 	}
 }
 
