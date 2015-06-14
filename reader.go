@@ -29,6 +29,14 @@ type Keyword struct {
 func (k Keyword) Key() string          { return "key" }
 func (k Keyword) Value() []interface{} { return []interface{}{k.Namespace, k.Name} }
 
+func (k Keyword) String() string {
+	if k.Namespace == "" {
+		return fmt.Sprintf(":%s", k.Name)
+	} else {
+		return fmt.Sprintf(":%s/%s", k.Namespace, k.Name)
+	}
+}
+
 type structType struct {
 	tag    string
 	fields int
