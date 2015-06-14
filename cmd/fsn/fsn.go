@@ -24,6 +24,8 @@ func prettySprint(value interface{}) string {
 		} else {
 			return fmt.Sprintf(":%s/%s", value.Namespace, value.Name)
 		}
+	case fressian.UUID:
+		return value.String()
 	default:
 		log.Fatalf("unexpected value: %#v", value)
 		return ""
@@ -54,7 +56,7 @@ func prettyPrint(indent string, value interface{}) {
 			}
 
 			switch val.(type) {
-			case bool, byte, int, float32, float64, string, fressian.Keyword:
+			case bool, byte, int, float32, float64, string, fressian.Keyword, fressian.UUID:
 				fmt.Printf("%s%s %s\n", indent+"  ", prettySprint(key), prettySprint(val))
 			default:
 				prettyPrint(indent+"  ", key)
@@ -125,7 +127,7 @@ func prettyPrint(indent string, value interface{}) {
 			}
 		}
 
-	case fressian.Keyword:
+	case fressian.Keyword, fressian.UUID:
 		fmt.Printf("%s%s\n", indent, prettySprint(value))
 
 	default:
