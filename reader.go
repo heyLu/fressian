@@ -490,6 +490,7 @@ func (r *Reader) readOpenList() []interface{} {
 	for {
 		code := r.readNextCode()
 		if r.err() == io.EOF {
+			r.raw.err = nil
 			code = END_COLLECTION
 		}
 		if code == END_COLLECTION {
