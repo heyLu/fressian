@@ -42,6 +42,22 @@ func DefaultHandler(w *Writer, val interface{}) error {
 	case time.Time:
 		w.writeCode(INST)
 		return w.WriteInt(int(val.Unix() * 1000))
+	case []bool:
+		w.writeCode(BOOLEAN_ARRAY)
+		w.writeCount(len(val))
+		for _, b := range val {
+			w.WriteBool(b)
+		}
+		return w.Error()
+	case []int:
+		w.writeCode(INT_ARRAY)
+		w.writeCount(len(val))
+		for _, i := range val {
+			w.WriteInt(i)
+		}
+		return w.Error()
+	case []byte:
+		return w.WriteBytes_(val, 0, len(val))
 	case []interface{}:
 		return w.WriteList(val)
 	default:
