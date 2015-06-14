@@ -38,7 +38,7 @@ func DefaultHandler(w *Writer, val interface{}) error {
 		return w.WriteValue(val.Name)
 	case UUID:
 		w.writeCode(CODE_UUID)
-		w.WriteValue(val.Bytes())
+		return w.WriteValue(val.Bytes())
 	case time.Time:
 		w.writeCode(INST)
 		return w.WriteInt(int(val.Unix() * 1000))
@@ -64,8 +64,8 @@ func DefaultHandler(w *Writer, val interface{}) error {
 			}
 			w.writeCode(MAP)
 			return w.WriteList(kvs)
+		default:
+			return ConversionError(errors.New(fmt.Sprintf("don't know how to convert '%s'", val)))
 		}
 	}
-
-	return ConversionError(errors.New(fmt.Sprintf("don't know how to convert '%s'", val)))
 }
