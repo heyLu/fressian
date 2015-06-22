@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	"io"
 	"log"
+	"math/big"
 	"net/url"
 	"time"
 )
@@ -280,7 +281,19 @@ func (r *Reader) read(code byte) interface{} {
 	case URI:
 		result = r.handleStruct("uri", 1)
 
-		// TODO: BIGINT, BIGDEC
+	case BIGINT:
+		bs := r.readValue().([]byte)
+		result = bigIntFromBytes(bs)
+
+	case BIGDEC:
+		// result = i * pow(10, -scale) = i * (1/pow(10, scale))
+		bs := r.readValue().([]byte)
+		i := bigIntFromBytes(bs)
+		d := new(big.Rat).SetInt(i)
+		scale := int64(r.readInt())
+		exp := new(big.Int).Exp(big.NewInt(10), big.NewInt(scale), nil)
+		invExp := new(big.Rat).Inv(new(big.Rat).SetInt(exp))
+		result = d.Mul(d, invExp)
 
 	case INST:
 		milliseconds := int64(r.readInt())
@@ -539,6 +552,21 @@ func (r *Reader) handleStruct(key string, fieldCount int) interface{} {
 	}
 
 	return nil
+}
+
+func bigIntFromBytes(bs []byte) *big.Int {
+	negative := (bs[0] >> 7) == 1
+	i := new(big.Int)
+	if negative {
+		for i, _ := range bs {
+			bs[i] = 0xff ^ bs[i]
+		}
+		bs[len(bs)-1] += 1
+		i = i.SetBytes(bs)
+		return i.Neg(i)
+	} else {
+		return i.SetBytes(bs)
+	}
 }
 
 func lookupCache(cache []interface{}, idx int) interface{} {

@@ -13,7 +13,13 @@
 
 ;(.writeObject w (long-array [1 2 3]))
 
-(.writeObject w (java.util.Date.))
+;(.writeObject w (java.util.Date.))
+
+(defn bi [s] (java.math.BigInteger. s))
+(.writeObject w (mapv bi ["0" "1" "2" "7" "1000" "1001"
+                          "-0" "-1" "-2" "-7" "-1000" "-1001"
+                          "424242424242424242"
+                          "-424242424242424242"]))
 
 ;(.writeObject w [1 2 3 4 5])
 ;(.writeObject w [1 2 3 4 5 "hello"])
