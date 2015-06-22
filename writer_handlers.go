@@ -3,6 +3,7 @@ package fressian
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"net/url"
 	"reflect"
 	"time"
@@ -46,6 +47,16 @@ func DefaultHandler(w *Writer, val interface{}) error {
 	case *url.URL:
 		w.writeCode(URI)
 		return w.WriteString(val.String())
+	case big.Int:
+		w.writeCode(BIGINT)
+		bs := val.Bytes()
+		if val.Sign() < 0 {
+			for i, _ := range bs {
+				bs[i] ^= 0xff
+			}
+			bs[len(bs)-1] -= 1
+		}
+		return w.WriteBytes_(bs, 0, len(bs))
 	case []bool:
 		w.writeCode(BOOLEAN_ARRAY)
 		w.writeCount(len(val))
