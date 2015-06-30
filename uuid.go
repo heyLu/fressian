@@ -3,6 +3,7 @@ package fressian
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"log"
 )
@@ -26,6 +27,20 @@ func NewUUIDFromBytes(buf []byte) UUID {
 	msb := binary.BigEndian.Uint64(buf[0:8])
 	lsb := binary.BigEndian.Uint64(buf[8:])
 	return UUID{msb, lsb}
+}
+
+func NewUUIDFromString(s string) (*UUID, error) {
+	if len(s) != 36 {
+		return nil, fmt.Errorf("uuid must be of format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+	}
+	s = s[0:8] + s[9:13] + s[14:18] + s[19:23] + s[24:]
+	bs, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+	msb := binary.BigEndian.Uint64(bs[0:8])
+	lsb := binary.BigEndian.Uint64(bs[8:])
+	return &UUID{msb, lsb}, nil
 }
 
 func (u UUID) Bytes() []byte {
